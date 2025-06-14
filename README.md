@@ -1,54 +1,110 @@
-# React + TypeScript + Vite
+# AI Recruiter Analytics Dashboard
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A sophisticated web application that transforms CSV conversation data from AI recruiting systems into actionable insights through advanced analytics and AI-powered analysis using Google Gemini API.
 
-Currently, two official plugins are available:
+## 🚀 Features
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+### ✅ Completed
+- **Phase 1: Project Infrastructure**
+  - React with TypeScript and Vite
+  - Tailwind CSS with custom theme
+  - ESLint and Prettier configuration
+  - Dark/Light mode support
 
-## Expanding the ESLint configuration
+- **Phase 2: Core Data Processing**
+  - Drag-and-drop CSV file upload
+  - Real-time file validation
+  - CSV parsing with error handling
+  - Progress indication during processing
+  - Data normalization and structuring
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+### 🔄 In Progress
+- **Phase 3: AI Integration**
+  - Google Gemini API integration
+  - Candidate status classification
+  - Multi-dimensional scoring
+  - Sentiment analysis
 
-```js
-export default tseslint.config({
-  extends: [
-    // Remove ...tseslint.configs.recommended and replace with this
-    ...tseslint.configs.recommendedTypeChecked,
-    // Alternatively, use this for stricter rules
-    ...tseslint.configs.strictTypeChecked,
-    // Optionally, add this for stylistic rules
-    ...tseslint.configs.stylisticTypeChecked,
-  ],
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
+### 📋 Upcoming
+- **Phase 4: Dashboard Development**
+  - Interactive data visualizations
+  - Candidate analysis cards
+  - Strategic recommendations
+  
+- **Phase 5: Polish & Launch**
+  - PDF export functionality
+  - Performance optimizations
+  - Comprehensive testing
+
+## 🛠️ Tech Stack
+
+- **Frontend**: React 19, TypeScript
+- **Build Tool**: Vite
+- **Styling**: Tailwind CSS v4
+- **Data Processing**: PapaParse
+- **AI Integration**: Google Gemini API
+- **Charts**: Recharts (planned)
+- **PDF Export**: jsPDF (planned)
+
+## 📦 Installation
+
+1. Clone the repository:
+```bash
+git clone https://github.com/mivan202120/AIrecruiter-dashboard.git
+cd AIrecruiter-dashboard
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
-
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default tseslint.config({
-  plugins: {
-    // Add the react-x and react-dom plugins
-    'react-x': reactX,
-    'react-dom': reactDom,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended typescript rules
-    ...reactX.configs['recommended-typescript'].rules,
-    ...reactDom.configs.recommended.rules,
-  },
-})
+2. Install dependencies:
+```bash
+npm install
 ```
+
+3. Create a `.env` file based on `.env.example`:
+```bash
+cp .env.example .env
+```
+
+4. Add your Google Gemini API key to `.env`:
+```
+VITE_GEMINI_API_KEY=your_gemini_api_key_here
+```
+
+## 🚀 Development
+
+Start the development server:
+```bash
+npm run dev
+```
+
+Other available commands:
+- `npm run build` - Build for production
+- `npm run lint` - Run ESLint
+- `npm run format` - Format code with Prettier
+- `npm run type-check` - Check TypeScript types
+
+## 📊 CSV Format
+
+The application expects CSV files with the following columns:
+
+| Column | Required | Description |
+|--------|----------|-------------|
+| MessageID | Yes | Unique identifier for each message |
+| CandidateID | Yes | Identifier to group messages by candidate |
+| Entity | Yes | "AI" or "user" |
+| Message | Yes | The message content |
+| Date | Yes | Format: "d/m/yyyy h:mm am/pm" |
+| FullName | No | Candidate's full name |
+
+See `sample-data.csv` for an example.
+
+## 🤝 Contributing
+
+This project is currently in active development. Contributions are welcome!
+
+## 📄 License
+
+This project is licensed under the MIT License.
+
+---
+
+Built with ❤️ using React, TypeScript, and AI
