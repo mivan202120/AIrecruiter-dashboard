@@ -24,6 +24,8 @@ export interface CandidateConversation {
   duration: number
   startTime: Date
   endTime: Date
+  decision?: 'PASS' | 'FAIL' | 'NO_RESP'
+  tags?: string[]
 }
 
 export interface CandidateAnalysis {
@@ -46,7 +48,24 @@ export interface CandidateAnalysis {
     messageCount: number
     duration: number
     startTime: Date
-    endTime: Date
+    tags: string[]
+  }
+  aiAnalysis: {
+    overallAssessment: string
+    keyStrengths: string[]
+    areasForImprovement: string[]
+    dimensionScores: {
+      technicalExperience: number
+      problemSolvingAbility: number
+      communicationClarity: number
+      culturalFit: number
+      motivationLevel: number
+      overallReadiness: number
+    }
+    hiringRecommendation: string
+    nextSteps: string
+    sentiment?: 'Positive' | 'Negative' | 'Neutral'
+    rejectionReason?: string
   }
 }
 
@@ -68,6 +87,18 @@ export interface Recommendation {
   description: string
 }
 
+export interface DailyConversationCount {
+  date: string
+  count: number
+  candidates: string[]
+}
+
+export interface ProcessingMetrics {
+  tokensUsed?: number
+  processingTimeMs: number
+  apiCalls?: number
+}
+
 export interface DashboardData {
   totalMessages: number
   totalUsers: number
@@ -79,4 +110,6 @@ export interface DashboardData {
     rejected: number
     noResponse: number
   }
+  dailyConversations: DailyConversationCount[]
+  processingMetrics?: ProcessingMetrics
 }

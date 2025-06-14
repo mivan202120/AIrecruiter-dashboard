@@ -1,17 +1,69 @@
 export const parseDate = (dateString: string): Date => {
-  // Expected format: "d/m/yyyy h:mm am/pm"
-  const [datePart, timePart, period] = dateString.split(' ')
-  const [day, month, year] = datePart.split('/').map(Number)
-  let [hours] = timePart.split(':').map(Number)
-  const [, minutes] = timePart.split(':').map(Number)
-
-  if (period.toLowerCase() === 'pm' && hours !== 12) {
-    hours += 12
-  } else if (period.toLowerCase() === 'am' && hours === 12) {
-    hours = 0
+  // Handle undefined, null, or empty strings
+  if (!dateString || dateString.trim() === '') {
+    console.error('Empty or undefined date string provided')
+    return new Date() // Return current date as fallback
   }
 
-  return new Date(year, month - 1, day, hours, minutes)
+  try {
+    // Handle format with no space between time and am/pm (e.g., "11:45am")
+    let normalizedDateString = dateString.trim()
+    
+    // Add space before am/pm if missing
+    normalizedDateString = normalizedDateString.replace(/(\d{1,2}:\d{2})(am|pm)/i, '$1 $2')
+    
+    // Expected format: "d/m/yyyy h:mm am/pm"
+    const parts = normalizedDateString.split(' ')
+    
+    if (parts.length < 3) {
+      console.error('Invalid date format:', dateString)
+      return new Date(dateString) // Try native parsing as fallback
+    }
+
+    const [datePart, timePart, period] = parts
+    
+    if (!datePart || !timePart || !period) {
+      console.error('Missing date components:', { datePart, timePart, period })
+      return new Date(dateString) // Try native parsing as fallback
+    }
+
+    const dateParts = datePart.split('/')
+    if (dateParts.length !== 3) {
+      console.error('Invalid date part format:', datePart)
+      return new Date(dateString) // Try native parsing as fallback
+    }
+
+    const [day, month, year] = dateParts.map(Number)
+    
+    const timeParts = timePart.split(':')
+    if (timeParts.length !== 2) {
+      console.error('Invalid time part format:', timePart)
+      return new Date(dateString) // Try native parsing as fallback
+    }
+
+    let [hours, minutes] = timeParts.map(Number)
+
+    // Handle AM/PM
+    const lowerPeriod = period.toLowerCase()
+    if (lowerPeriod === 'pm' && hours !== 12) {
+      hours += 12
+    } else if (lowerPeriod === 'am' && hours === 12) {
+      hours = 0
+    }
+
+    // Validate parsed values
+    if (isNaN(day) || isNaN(month) || isNaN(year) || isNaN(hours) || isNaN(minutes)) {
+      console.error('Invalid numeric values in date:', { day, month, year, hours, minutes })
+      return new Date(dateString) // Try native parsing as fallback
+    }
+
+    return new Date(year, month - 1, day, hours, minutes)
+  } catch (error) {
+    console.error('Error parsing date:', dateString, error)
+    // Try native Date parsing as last resort
+    const fallbackDate = new Date(dateString)
+    return isNaN(fallbackDate.getTime()) ? new Date() : fallbackDate
+  }
 }
 
 export const formatDuration = (milliseconds: number): string => {
@@ -31,12 +83,44 @@ export const formatDuration = (milliseconds: number): string => {
   }
 }
 
-export const formatDate = (date: Date): string => {
-  return new Intl.DateTimeFormat('en-US', {
-    year: 'numeric',
-    month: 'short',
-    day: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit',
-  }).format(date)
+export const formatDate = (date: Date | string): string => {
+  try {
+    // Handle both Date objects and date strings
+    const dateObj = date instanceof Date ? date : new Date(date)
+    
+    // Check if the date is valid
+    if (isNaN(dateObj.getTime())) {
+      console.error('Invalid date value:', date)
+      return '—'
+    }
+    
+    return new Intl.DateTimeFormat('en-US', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+    }).format(dateObj)
+  } catch (error) {
+    console.error('Error formatting date:', date, error)
+    return '—'
+  }
+}
+
+// Utility to ensure a value is a Date object
+export const ensureDate = (date: Date | string | any): Date => {
+  if (date instanceof Date) {
+    return date
+  }
+  
+  // Try to create a Date from the value
+  const dateObj = new Date(date)
+  
+  // If invalid, return current date as fallback
+  if (isNaN(dateObj.getTime())) {
+    console.error('Invalid date, using current date as fallback:', date)
+    return new Date()
+  }
+  
+  return dateObj
 }

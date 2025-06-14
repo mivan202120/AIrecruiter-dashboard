@@ -39,9 +39,14 @@ export const parseCSVFile = (file: File): Promise<ParseResult> => {
 }
 
 const processCSVData = (rows: CSVRow[], headers: string[]): ParseResult => {
+  console.log('Processing CSV data with headers:', headers)
+  console.log('Total rows to process:', rows.length)
+  console.log('First row sample:', rows[0])
+  
   // Validate headers
   const headerValidation = validateCSVHeaders(headers)
   if (!headerValidation.isValid) {
+    console.error('Header validation failed:', headerValidation)
     return {
       success: false,
       error: `Missing required columns: ${headerValidation.missingColumns.join(', ')}`,
@@ -54,6 +59,11 @@ const processCSVData = (rows: CSVRow[], headers: string[]): ParseResult => {
 
   rows.forEach((row, index) => {
     try {
+      // Log problematic rows
+      if (index < 3 || !row.Date || !row.Entity || !row.CandidateID) {
+        console.log(`Row ${index + 2}:`, row)
+      }
+      
       const entity = ENTITY_MAPPING[row.Entity as keyof typeof ENTITY_MAPPING]
       if (!entity) {
         console.warn(`Invalid entity "${row.Entity}" at row ${index + 2}`)
@@ -72,7 +82,8 @@ const processCSVData = (rows: CSVRow[], headers: string[]): ParseResult => {
 
       parsedMessages.push(parsedMessage)
     } catch (error) {
-      console.warn(`Error parsing row ${index + 2}:`, error)
+      console.error(`Error parsing row ${index + 2}:`, error)
+      console.error('Problematic row data:', row)
       errorRows.push(index + 2)
     }
   })
@@ -105,6 +116,18 @@ const processCSVData = (rows: CSVRow[], headers: string[]): ParseResult => {
       }
     }
   )
+
+  console.log('CSV parsing complete:')
+  console.log('- Total rows:', rows.length)
+  console.log('- Parsed messages:', parsedMessages.length)
+  console.log('- Error rows:', errorRows.length)
+  console.log('- Conversations created:', conversations.length)
+  console.log('- Conversations:', conversations.map(c => ({
+    candidateId: c.candidateId,
+    name: c.candidateName,
+    messages: c.messageCount,
+    duration: c.duration
+  })))
 
   return {
     success: true,

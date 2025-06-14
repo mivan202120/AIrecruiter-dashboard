@@ -1,0 +1,22 @@
+MessageID,CandidateID,Entity,Message,Date,FullName
+msg_001,user_001,AI,Hello John! Thanks for joining our AI-powered interview. Let's start with your background. Can you tell me about your experience with machine learning?,15/1/2024 10:00 am,John Smith
+msg_002,user_001,user,Hi! I have 5 years of experience in ML primarily working with Python and TensorFlow. I've built several production models for predictive analytics.,15/1/2024 10:03 am,John Smith
+msg_003,user_001,AI,That's impressive! Can you share a specific project you're proud of?,15/1/2024 10:05 am,John Smith
+msg_004,user_001,user,Sure! I led a team that developed a recommendation system that increased user engagement by 35%. We used collaborative filtering and deep learning.,15/1/2024 10:07 am,John Smith
+msg_005,user_001,AI,Excellent! How do you stay updated with the latest AI trends?,15/1/2024 10:10 am,John Smith
+msg_006,user_001,user,I regularly read papers on arXiv attend conferences like NeurIPS and contribute to open-source projects.,15/1/2024 10:12 am,John Smith
+msg_007,user_001,AI,What interests you about our company?,15/1/2024 10:15 am,John Smith
+msg_008,user_001,user,Your focus on ethical AI and the challenging problems you're solving in healthcare really align with my values and interests.,15/1/2024 10:18 am,John Smith
+msg_009,user_001,AI,Great answers John! We'll be in touch soon.,15/1/2024 10:20 am,John Smith
+msg_010,user_002,AI,Welcome Sarah! Let's dive into your experience. What programming languages are you most comfortable with?,15/1/2024 11:30 am,Sarah Johnson
+msg_011,user_002,user,I'm proficient in Python Java and JavaScript. I've been coding for about 3 years.,15/1/2024 11:32 am,Sarah Johnson
+msg_012,user_002,AI,Good! Have you worked with any AI or ML frameworks?,15/1/2024 11:34 am,Sarah Johnson
+msg_013,user_002,user,I've done some tutorials with scikit-learn but haven't used it professionally yet.,15/1/2024 11:36 am,Sarah Johnson
+msg_014,user_002,AI,What draws you to AI and our company?,15/1/2024 11:38 am,Sarah Johnson
+msg_015,user_002,user,I'm fascinated by AI's potential and want to transition into this field. Your company seems like a great place to learn.,15/1/2024 11:40 am,Sarah Johnson
+msg_016,user_002,AI,We appreciate your enthusiasm! We'll review your application and get back to you.,15/1/2024 11:45 am,Sarah Johnson
+msg_017,user_003,AI,Hi Michael! Thanks for your interest. Can you share your relevant experience?,15/1/2024 2:00 pm,Michael Brown
+msg_018,user_003,user,Hello! I have 10 years in software engineering and 3 years specifically in AI/ML.,15/1/2024 2:02 pm,Michael Brown
+msg_019,user_003,AI,Impressive! What types of AI projects have you worked on?,15/1/2024 2:05 pm,Michael Brown
+msg_020,user_003,user,Sorry I need to step away. Can we reschedule?,15/1/2024 2:08 pm,Michael Brown
+msg_021,user_003,AI,Of course! Please reach out when you're available.,15/1/2024 2:10 pm,Michael Brown

@@ -5,6 +5,18 @@ export const ENTITY_MAPPING = {
   user: 'CANDIDATE',
   AI_RECRUITER: 'AI_RECRUITER',
   CANDIDATE: 'CANDIDATE',
+  // Add variations to handle different formats
+  ai: 'AI_RECRUITER',
+  User: 'CANDIDATE',
+  USER: 'CANDIDATE',
+  candidate: 'CANDIDATE',
+  Candidate: 'CANDIDATE',
+  recruiter: 'AI_RECRUITER',
+  Recruiter: 'AI_RECRUITER',
+  RECRUITER: 'AI_RECRUITER',
+  assistant: 'AI_RECRUITER',
+  Assistant: 'AI_RECRUITER',
+  ASSISTANT: 'AI_RECRUITER',
 } as const
 
 export const STATUS_COLORS = {

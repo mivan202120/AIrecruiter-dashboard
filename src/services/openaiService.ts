@@ -1,17 +1,32 @@
 import OpenAI from 'openai'
-import type { CandidateConversation, CandidateAnalysis } from '../types'
+import type { CandidateConversation, CandidateAnalysis, AggregateAnalysis } from '../types'
+import { validateOpenAIApiKey } from './apiKeyValidator'
 
 // OpenAI configuration
 const apiKey = import.meta.env.VITE_OPENAI_API_KEY
 const model = import.meta.env.VITE_OPENAI_MODEL || 'gpt-4o-mini'
 
-// Initialize OpenAI client
-const openai = apiKey
-  ? new OpenAI({
-      apiKey,
-      dangerouslyAllowBrowser: true, // Note: In production, use a backend service
-    })
-  : null
+// Initialize OpenAI client with validation
+let openai: OpenAI | null = null
+let apiKeyValidated = false
+
+const initializeOpenAI = async () => {
+  if (!apiKeyValidated && apiKey) {
+    const validation = await validateOpenAIApiKey(apiKey)
+    apiKeyValidated = true
+    
+    if (validation.isValid) {
+      openai = new OpenAI({
+        apiKey,
+        dangerouslyAllowBrowser: true, // Note: In production, use a backend service
+      })
+    } else {
+      console.error('OpenAI API key validation failed:', validation.error)
+      openai = null
+    }
+  }
+  return openai
+}
 
 // Rate limiting
 const MIN_REQUEST_INTERVAL = 1000 // 1 second between requests
@@ -60,20 +75,31 @@ export const isOpenAIConfigured = () => {
 export const analyzeCandidateConversation = async (
   conversation: CandidateConversation
 ): Promise<CandidateAnalysis> => {
-  if (!openai) {
-    throw new Error('OpenAI API key not configured')
+  console.log(`Analyzing candidate: ${conversation.candidateName} (${conversation.candidateId})`)
+  console.log(`Messages in conversation: ${conversation.messageCount}`)
+  console.log('First few messages:', conversation.messages.slice(0, 3).map(m => ({
+    entity: m.entity,
+    message: m.message.substring(0, 50) + '...'
+  })))
+  
+  const client = await initializeOpenAI()
+  if (!client) {
+    throw new Error('OpenAI API key not configured or invalid')
   }
 
   const prompt = `
-    Analyze this AI recruiter conversation and provide a structured evaluation.
+    Analyze this complete AI recruiter conversation transcript and provide a comprehensive evaluation of the candidate.
     
     Candidate: ${conversation.candidateName}
-    Decision: ${conversation.decision}
-    Message Count: ${conversation.messageCount}
-    Duration: ${Math.round(conversation.duration / 1000 / 60)} minutes
+    ${conversation.decision ? `Pre-determined Decision: ${conversation.decision}` : ''}
+    Total Messages: ${conversation.messageCount}
+    Conversation Duration: ${Math.round(conversation.duration / 1000 / 60)} minutes
     
-    Conversation:
-    ${conversation.messages}
+    Full Conversation Transcript:
+    ${conversation.messages.map((m, i) => `[${i + 1}] ${m.entity === 'AI_RECRUITER' ? 'AI Recruiter' : 'Candidate'}: ${m.message}`).join('\n')}
+    
+    Based on the ENTIRE conversation above, evaluate the candidate across multiple dimensions.
+    Consider their responses, engagement level, technical knowledge, communication skills, and overall fit.
     
     Provide a JSON response with the following structure:
     {
@@ -89,13 +115,15 @@ export const analyzeCandidateConversation = async (
         "overallReadiness": 0-100
       },
       "hiringRecommendation": "One of: STRONG_YES, YES, MAYBE, NO, STRONG_NO",
-      "nextSteps": "Specific recommendation for next steps"
+      "nextSteps": "Specific recommendation for next steps",
+      "sentiment": "One of: Positive, Negative, Neutral - Overall sentiment of candidate's responses",
+      "rejectionReason": "If hiringRecommendation is NO or STRONG_NO, provide specific reason"
     }
   `
 
   try {
     const response = await retryWithBackoff(async () => {
-      const completion = await openai.chat.completions.create({
+      const completion = await client.chat.completions.create({
         model,
         messages: [
           {
@@ -116,36 +144,57 @@ export const analyzeCandidateConversation = async (
       const content = completion.choices[0]?.message?.content
       if (!content) throw new Error('No response from OpenAI')
 
+      console.log(`OpenAI response for ${conversation.candidateName}:`, content.substring(0, 200) + '...')
       return JSON.parse(content)
     })
+
+    // Determine status based on AI recommendation if no decision provided
+    let status: 'PASS' | 'FAIL' | 'NO_RESP' = 'NO_RESP'
+    if (conversation.decision) {
+      status = conversation.decision
+    } else if (response.hiringRecommendation) {
+      if (response.hiringRecommendation === 'STRONG_YES' || response.hiringRecommendation === 'YES') {
+        status = 'PASS'
+      } else if (response.hiringRecommendation === 'NO' || response.hiringRecommendation === 'STRONG_NO') {
+        status = 'FAIL'
+      }
+    }
 
     return {
       candidateId: conversation.candidateId,
       candidateName: conversation.candidateName,
-      status: conversation.decision,
+      status,
+      sentiment: response.sentiment || 'Neutral',
+      rejectionReason: response.rejectionReason,
       conversationMetrics: {
         messageCount: conversation.messageCount,
         duration: conversation.duration,
-        startTime: new Date(conversation.startTime),
-        tags: conversation.tags.split(',').map((tag) => tag.trim()),
+        startTime: conversation.startTime instanceof Date ? conversation.startTime : new Date(conversation.startTime),
+        tags: conversation.tags || [],
       },
       aiAnalysis: response,
     }
   } catch (error) {
     console.error('Error analyzing candidate:', error)
+    if (error instanceof Error) {
+      if (error.message.includes('401')) {
+        throw new Error('OpenAI API authentication failed. Please check your API key.')
+      } else if (error.message.includes('429')) {
+        throw new Error('OpenAI API rate limit exceeded. Please try again later.')
+      } else if (error.message.includes('insufficient_quota')) {
+        throw new Error('OpenAI API quota exceeded. Please check your billing.')
+      }
+    }
     throw error
   }
 }
 
 export const generateAggregateInsights = async (
   candidates: CandidateAnalysis[]
-): Promise<{
-  keyInsights: string[]
-  recommendations: string[]
-  durationKeyFinding: string
-}> => {
-  if (!openai) {
-    throw new Error('OpenAI API key not configured')
+): Promise<AggregateAnalysis> => {
+  const client = await initializeOpenAI()
+  if (!client) {
+    throw new Error('OpenAI API key not configured or invalid')
   }
 
   const summary = {
@@ -160,23 +209,27 @@ export const generateAggregateInsights = async (
   }
 
   const prompt = `
-    Analyze this aggregate recruitment data and provide insights.
+    Analyze this comprehensive recruitment data from AI-conducted interviews and provide strategic insights.
     
-    Summary:
-    - Total Candidates: ${summary.total}
-    - Approved: ${summary.approved} (${((summary.approved / summary.total) * 100).toFixed(1)}%)
+    Overall Statistics:
+    - Total Candidates Interviewed: ${summary.total}
+    - Approved for Next Round: ${summary.approved} (${((summary.approved / summary.total) * 100).toFixed(1)}%)
     - Rejected: ${summary.rejected} (${((summary.rejected / summary.total) * 100).toFixed(1)}%)
-    - No Response: ${summary.noResponse} (${((summary.noResponse / summary.total) * 100).toFixed(1)}%)
-    - Average Duration: ${Math.round(summary.avgDuration / 1000 / 60)} minutes
-    - Average Messages: ${summary.avgMessages.toFixed(1)}
+    - No Response/Incomplete: ${summary.noResponse} (${((summary.noResponse / summary.total) * 100).toFixed(1)}%)
+    - Average Conversation Duration: ${Math.round(summary.avgDuration / 1000 / 60)} minutes
+    - Average Messages per Conversation: ${summary.avgMessages.toFixed(1)}
     
-    Individual Assessments:
+    Detailed Candidate Assessments:
     ${candidates
       .map(
-        (c) => `
-      ${c.candidateName}: ${c.status}
-      Hiring Recommendation: ${c.aiAnalysis.hiringRecommendation}
-      Overall Assessment: ${c.aiAnalysis.overallAssessment}
+        (c, i) => `
+      Candidate ${i + 1}: ${c.candidateName}
+      - Status: ${c.status}
+      - Conversation Length: ${c.conversationMetrics.messageCount} messages
+      - Duration: ${Math.round(c.conversationMetrics.duration / 1000 / 60)} minutes
+      - AI Recommendation: ${c.aiAnalysis.hiringRecommendation}
+      - Assessment: ${c.aiAnalysis.overallAssessment}
+      - Key Strengths: ${c.aiAnalysis.keyStrengths.join(', ')}
     `
       )
       .join('\n')}
@@ -198,7 +251,7 @@ export const generateAggregateInsights = async (
 
   try {
     const response = await retryWithBackoff(async () => {
-      const completion = await openai.chat.completions.create({
+      const completion = await client.chat.completions.create({
         model,
         messages: [
           {
@@ -223,9 +276,10 @@ export const generateAggregateInsights = async (
     })
 
     return {
-      keyInsights: response.keyInsights,
-      recommendations: response.recommendations,
-      durationKeyFinding: response.durationKeyFinding,
+      keyInsights: response.keyInsights || [],
+      recommendations: response.recommendations || [],
+      observedBehaviors: response.observedBehaviors || ['High engagement levels across candidates'],
+      durationKeyFinding: response.durationKeyFinding || 'Analysis complete',
     }
   } catch (error) {
     console.error('Error generating insights:', error)

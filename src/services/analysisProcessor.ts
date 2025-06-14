@@ -5,6 +5,7 @@ import type {
   DashboardData,
   AggregateAnalysis,
 } from '../types'
+import { calculateDailyConversations } from '../utils/conversationStats'
 
 export interface ProcessingProgress {
   stage: 'analyzing' | 'aggregating' | 'complete'
@@ -45,8 +46,8 @@ export const processConversations = async (
         conversationMetrics: {
           messageCount: conversation.messageCount,
           duration: conversation.duration,
-          startTime: conversation.startTime,
-          endTime: conversation.endTime,
+          startTime: conversation.startTime instanceof Date ? conversation.startTime : new Date(conversation.startTime),
+          tags: conversation.tags || [],
         },
       })
     }
@@ -100,6 +101,9 @@ export const processConversations = async (
     message: 'Analysis complete!',
   })
 
+  // Calculate daily conversations
+  const dailyConversations = calculateDailyConversations(candidates)
+
   return {
     totalMessages,
     totalUsers: conversations.length,
@@ -107,5 +111,6 @@ export const processConversations = async (
     candidates,
     aggregateAnalysis,
     statusDistribution,
+    dailyConversations,
   }
 }

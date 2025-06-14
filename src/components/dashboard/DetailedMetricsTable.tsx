@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import type { CandidateAnalysis } from '../../types'
-import { formatDuration, formatDate } from '../../utils/dateUtils'
+import { formatDuration, formatDate, ensureDate } from '../../utils/dateUtils'
 import { STATUS_COLORS } from '../../constants'
 
 interface DetailedMetricsTableProps {
@@ -44,8 +44,12 @@ export const DetailedMetricsTable = ({ candidates }: DetailedMetricsTableProps) 
         bValue = b.conversationMetrics.duration
         break
       case 'startTime':
-        aValue = a.conversationMetrics.startTime.getTime()
-        bValue = b.conversationMetrics.startTime.getTime()
+        // Ensure dates are Date objects before sorting
+        const aDate = ensureDate(a.conversationMetrics.startTime)
+        const bDate = ensureDate(b.conversationMetrics.startTime)
+        
+        aValue = aDate.getTime()
+        bValue = bDate.getTime()
         break
     }
 

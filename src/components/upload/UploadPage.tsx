@@ -3,6 +3,7 @@ import { FileUpload } from './FileUpload'
 import { CSVFormatHelper } from './CSVFormatHelper'
 import { ProgressIndicator } from '../common/ProgressIndicator'
 import { parseCSVFile } from '../../services/csvParser'
+import { parseSummaryCSVFile } from '../../services/csvParserSummary'
 import { useApiKey } from '../../hooks/useApiKey'
 import type { CandidateConversation } from '../../types'
 
@@ -15,7 +16,7 @@ export const UploadPage = ({ onDataProcessed }: UploadPageProps) => {
   const [progress, setProgress] = useState(0)
   const [status, setStatus] = useState('')
   const [error, setError] = useState<string | null>(null)
-  const { isConfigured } = useApiKey()
+  const { isConfigured, isValidating, validationError } = useApiKey()
 
   const handleFileSelect = async (file: File) => {
     setIsProcessing(true)
@@ -24,9 +25,22 @@ export const UploadPage = ({ onDataProcessed }: UploadPageProps) => {
     setStatus('Reading CSV file...')
 
     try {
-      // Parse CSV
+      // Read file to detect format
+      const text = await file.text()
+      const firstLine = text.split('\n')[0]
+      
+      // Detect CSV format based on headers
+      const isSummaryFormat = firstLine.includes('candidateId') && firstLine.includes('messages')
+      console.log('CSV Format detected:', isSummaryFormat ? 'Summary' : 'Standard')
+      console.log('First line:', firstLine)
+      
+      // Parse CSV using appropriate parser
       setProgress(20)
-      const parseResult = await parseCSVFile(file)
+      const parseResult = isSummaryFormat 
+        ? await parseSummaryCSVFile(file)
+        : await parseCSVFile(file)
+      
+      console.log('Parse result:', parseResult)
 
       if (!parseResult.success || !parseResult.data) {
         throw new Error(parseResult.error || 'Failed to parse CSV file')
@@ -75,7 +89,7 @@ export const UploadPage = ({ onDataProcessed }: UploadPageProps) => {
 
         {!isProcessing ? (
           <>
-            {!isConfigured && (
+            {!isValidating && !isConfigured && validationError && (
               <div className="max-w-2xl mx-auto mb-6">
                 <div className="p-4 bg-yellow-50 dark:bg-yellow-950 border border-yellow-200 dark:border-yellow-800 rounded-lg">
                   <div className="flex items-start">
@@ -94,13 +108,25 @@ export const UploadPage = ({ onDataProcessed }: UploadPageProps) => {
                     </svg>
                     <div>
                       <p className="text-yellow-800 dark:text-yellow-200 font-medium">
-                        OpenAI API Key Not Configured
+                        OpenAI API Key Issue
                       </p>
                       <p className="text-sm text-yellow-700 dark:text-yellow-300 mt-1">
-                        AI analysis features will be unavailable. Add your API key to the .env file
-                        to enable candidate analysis.
+                        {validationError}. AI analysis features will be unavailable until a valid API key is configured.
                       </p>
                     </div>
+                  </div>
+                </div>
+              </div>
+            )}
+            {isValidating && (
+              <div className="max-w-2xl mx-auto mb-6">
+                <div className="p-4 bg-blue-50 dark:bg-blue-950 border border-blue-200 dark:border-blue-800 rounded-lg">
+                  <div className="flex items-center">
+                    <svg className="animate-spin h-5 w-5 text-blue-600 dark:text-blue-400 mr-2" fill="none" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    <p className="text-blue-800 dark:text-blue-200">Validating OpenAI API key...</p>
                   </div>
                 </div>
               </div>

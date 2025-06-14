@@ -88,7 +88,7 @@ export const AnalysisProgress = ({ conversations, onComplete }: AnalysisProgress
           AI Analysis in Progress
         </h2>
         <p className="text-gray-600 dark:text-gray-400">
-          Using Google Gemini to analyze candidate conversations
+          Using OpenAI to analyze candidate conversations
         </p>
       </div>
 
