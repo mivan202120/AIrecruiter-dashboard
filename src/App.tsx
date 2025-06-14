@@ -1,21 +1,57 @@
 import { useState } from 'react'
-import { DataProvider } from './contexts/DataContext'
+import { DataProvider } from './contexts/DataProvider'
 import { useData } from './hooks/useData'
 import { UploadPage } from './components/upload/UploadPage'
-import type { CandidateConversation } from './types'
+import { AnalysisProgress } from './components/analysis/AnalysisProgress'
+import { Dashboard } from './components/dashboard/Dashboard'
+import { useApiKey } from './hooks/useApiKey'
+import type { CandidateConversation, DashboardData } from './types'
 
 function AppContent() {
   const [isDark, setIsDark] = useState(false)
-  const { rawData, setRawData } = useData()
+  const [isAnalyzing, setIsAnalyzing] = useState(false)
+  const { rawData, dashboardData, setRawData, setDashboardData, clearData } = useData()
+  const { isConfigured } = useApiKey()
 
   const handleDataProcessed = (data: CandidateConversation[]) => {
     setRawData(data)
+    if (isConfigured) {
+      setIsAnalyzing(true)
+    }
+  }
+
+  const handleAnalysisComplete = (data: DashboardData) => {
+    setDashboardData(data)
+    setIsAnalyzing(false)
+  }
+
+  const handleNewUpload = () => {
+    clearData()
+    setIsAnalyzing(false)
   }
 
   return (
     <div className={`min-h-screen ${isDark ? 'dark' : ''}`}>
       {!rawData ? (
         <UploadPage onDataProcessed={handleDataProcessed} />
+      ) : isAnalyzing ? (
+        <div className="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors">
+          <div className="container mx-auto px-4 py-8">
+            <header className="text-center mb-8">
+              <h1 className="text-3xl font-bold bg-gradient-to-r from-primary-600 to-accent-purple bg-clip-text text-transparent">
+                AI Recruiter Analytics Dashboard
+              </h1>
+            </header>
+            <AnalysisProgress conversations={rawData} onComplete={handleAnalysisComplete} />
+          </div>
+        </div>
+      ) : dashboardData ? (
+        <Dashboard
+          data={dashboardData}
+          isDark={isDark}
+          onThemeToggle={() => setIsDark(!isDark)}
+          onNewUpload={handleNewUpload}
+        />
       ) : (
         <div className="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors">
           <div className="container mx-auto px-4 py-8">
@@ -31,7 +67,7 @@ function AppContent() {
                   {isDark ? '☀️' : '🌙'}
                 </button>
                 <button
-                  onClick={() => setRawData(null)}
+                  onClick={handleNewUpload}
                   className="px-4 py-2 bg-gray-200 dark:bg-gray-700 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors"
                 >
                   Upload New File
@@ -57,12 +93,12 @@ function AppContent() {
                   </p>
                 </div>
               </div>
-              <div className="mt-6 p-4 bg-blue-50 dark:bg-blue-950 rounded-lg">
-                <p className="text-blue-700 dark:text-blue-300">
-                  ✅ Phase 2 Complete: CSV data successfully parsed and processed. Ready for AI
-                  analysis in Phase 3.
-                </p>
-              </div>
+              <button
+                onClick={() => setIsAnalyzing(true)}
+                className="mt-6 w-full px-6 py-3 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors font-medium"
+              >
+                Start AI Analysis
+              </button>
             </div>
           </div>
         </div>

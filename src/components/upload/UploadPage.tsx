@@ -3,6 +3,7 @@ import { FileUpload } from './FileUpload'
 import { CSVFormatHelper } from './CSVFormatHelper'
 import { ProgressIndicator } from '../common/ProgressIndicator'
 import { parseCSVFile } from '../../services/csvParser'
+import { useApiKey } from '../../hooks/useApiKey'
 import type { CandidateConversation } from '../../types'
 
 interface UploadPageProps {
@@ -14,6 +15,7 @@ export const UploadPage = ({ onDataProcessed }: UploadPageProps) => {
   const [progress, setProgress] = useState(0)
   const [status, setStatus] = useState('')
   const [error, setError] = useState<string | null>(null)
+  const { isConfigured } = useApiKey()
 
   const handleFileSelect = async (file: File) => {
     setIsProcessing(true)
@@ -73,6 +75,36 @@ export const UploadPage = ({ onDataProcessed }: UploadPageProps) => {
 
         {!isProcessing ? (
           <>
+            {!isConfigured && (
+              <div className="max-w-2xl mx-auto mb-6">
+                <div className="p-4 bg-yellow-50 dark:bg-yellow-950 border border-yellow-200 dark:border-yellow-800 rounded-lg">
+                  <div className="flex items-start">
+                    <svg
+                      className="w-5 h-5 text-yellow-600 dark:text-yellow-400 mt-0.5 mr-2"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
+                      />
+                    </svg>
+                    <div>
+                      <p className="text-yellow-800 dark:text-yellow-200 font-medium">
+                        Google Gemini API Key Not Configured
+                      </p>
+                      <p className="text-sm text-yellow-700 dark:text-yellow-300 mt-1">
+                        AI analysis features will be unavailable. Add your API key to the .env file
+                        to enable candidate analysis.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
             <FileUpload onFileSelect={handleFileSelect} isProcessing={isProcessing} />
             {error && (
               <div className="max-w-2xl mx-auto mt-4">
