@@ -17,9 +17,9 @@ interface DurationAnalysisProps {
 
 export const DurationAnalysis = ({ candidates, keyFinding }: DurationAnalysisProps) => {
   const durations = candidates.map((c) => c.conversationMetrics.duration).sort((a, b) => a - b)
-  const avgDuration = durations.reduce((sum, d) => sum + d, 0) / durations.length
-  const minDuration = Math.min(...durations)
-  const maxDuration = Math.max(...durations)
+  const avgDuration = durations.length > 0 ? durations.reduce((sum, d) => sum + d, 0) / durations.length : 0
+  const minDuration = durations.length > 0 ? Math.min(...durations) : 0
+  const maxDuration = durations.length > 0 ? Math.max(...durations) : 0
 
   // Prepare data for line chart
   const chartData = candidates

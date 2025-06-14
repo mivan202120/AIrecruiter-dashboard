@@ -113,7 +113,7 @@ export const Dashboard = ({ data, isDark, onThemeToggle, onNewUpload }: Dashboar
           <div className="text-center text-sm text-gray-600 dark:text-gray-400">
             <p>Analysis generated on {new Date(data.processedAt).toLocaleString()}</p>
             <p className="mt-2">
-              Powered by Google Gemini AI • Version {import.meta.env.VITE_APP_VERSION || '1.0.0'}
+              Powered by OpenAI • Version {import.meta.env.VITE_APP_VERSION || '1.0.0'}
             </p>
           </div>
         </footer>

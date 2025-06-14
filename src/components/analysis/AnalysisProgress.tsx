@@ -72,7 +72,7 @@ export const AnalysisProgress = ({ conversations, onComplete }: AnalysisProgress
             <p className="text-gray-600 dark:text-gray-400 mb-6">{error}</p>
             <div className="bg-yellow-50 dark:bg-yellow-900 p-4 rounded-lg">
               <p className="text-sm text-yellow-800 dark:text-yellow-200">
-                Tip: Make sure your Google Gemini API key is set in the .env file
+                Tip: Make sure your OpenAI API key is set in the .env file
               </p>
             </div>
           </div>

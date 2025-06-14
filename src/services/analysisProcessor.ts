@@ -1,4 +1,4 @@
-import { analyzeCandidate, generateAggregateAnalysis } from './geminiService'
+import { analyzeCandidateConversation, generateAggregateInsights } from './openaiService'
 import type {
   CandidateConversation,
   CandidateAnalysis,
@@ -32,7 +32,7 @@ export const processConversations = async (
     })
 
     try {
-      const analysis = await analyzeCandidate(conversation)
+      const analysis = await analyzeCandidateConversation(conversation)
       candidates.push(analysis as CandidateAnalysis)
     } catch (error) {
       console.error(`Failed to analyze candidate ${conversation.candidateId}:`, error)
@@ -62,7 +62,7 @@ export const processConversations = async (
 
   let aggregateAnalysis: AggregateAnalysis
   try {
-    aggregateAnalysis = await generateAggregateAnalysis(candidates)
+    aggregateAnalysis = await generateAggregateInsights(candidates)
   } catch (error) {
     console.error('Failed to generate aggregate analysis:', error)
     // Provide fallback aggregate analysis
@@ -75,7 +75,7 @@ export const processConversations = async (
         {
           priority: 'High',
           title: 'Configure API Access',
-          description: 'Ensure your Google Gemini API key is properly configured',
+          description: 'Ensure your OpenAI API key is properly configured',
         },
       ],
       observedBehaviors: ['Analysis unavailable'],

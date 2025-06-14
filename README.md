@@ -1,6 +1,6 @@
 # AI Recruiter Analytics Dashboard
 
-A sophisticated web application that transforms CSV conversation data from AI recruiting systems into actionable insights through advanced analytics and AI-powered analysis using Google Gemini API.
+A sophisticated web application that transforms CSV conversation data from AI recruiting systems into actionable insights through advanced analytics and AI-powered analysis using OpenAI API.
 
 ## 🚀 Features
 
@@ -20,7 +20,7 @@ A sophisticated web application that transforms CSV conversation data from AI re
 
 ### 🔄 In Progress
 - **Phase 3: AI Integration**
-  - Google Gemini API integration
+  - OpenAI API integration
   - Candidate status classification
   - Multi-dimensional scoring
   - Sentiment analysis
@@ -42,7 +42,7 @@ A sophisticated web application that transforms CSV conversation data from AI re
 - **Build Tool**: Vite
 - **Styling**: Tailwind CSS v4
 - **Data Processing**: PapaParse
-- **AI Integration**: Google Gemini API
+- **AI Integration**: OpenAI GPT-4
 - **Charts**: Recharts (planned)
 - **PDF Export**: jsPDF (planned)
 
@@ -64,9 +64,9 @@ npm install
 cp .env.example .env
 ```
 
-4. Add your Google Gemini API key to `.env`:
+4. Add your OpenAI API key to `.env`:
 ```
-VITE_GEMINI_API_KEY=your_gemini_api_key_here
+VITE_OPENAI_API_KEY=your_openai_api_key_here
 ```
 
 ## 🚀 Development

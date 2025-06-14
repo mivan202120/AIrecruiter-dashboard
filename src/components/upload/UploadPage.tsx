@@ -94,7 +94,7 @@ export const UploadPage = ({ onDataProcessed }: UploadPageProps) => {
                     </svg>
                     <div>
                       <p className="text-yellow-800 dark:text-yellow-200 font-medium">
-                        Google Gemini API Key Not Configured
+                        OpenAI API Key Not Configured
                       </p>
                       <p className="text-sm text-yellow-700 dark:text-yellow-300 mt-1">
                         AI analysis features will be unavailable. Add your API key to the .env file
