@@ -13,10 +13,10 @@ interface UploadPageProps {
 
 export const UploadPage = ({ onDataProcessed }: UploadPageProps) => {
   const [isProcessing, setIsProcessing] = useState(false)
-  const [progress, setProgress] = useState(0)
-  const [status, setStatus] = useState('')
   const [error, setError] = useState<string | null>(null)
   const [currentFile, setCurrentFile] = useState<File | null>(null)
+  const [progress, setProgress] = useState(0)
+  const [status, setStatus] = useState('')
   const { isConfigured, isValidating, validationError } = useApiKey()
 
   const handleFileSelect = async (file: File) => {
@@ -48,28 +48,13 @@ export const UploadPage = ({ onDataProcessed }: UploadPageProps) => {
         throw new Error(parseResult.error || 'Failed to parse CSV file')
       }
 
-      setProgress(40)
-
-      // Show filtering information if any test candidates were removed
-      if (parseResult.filteredCount && parseResult.filteredCount > 0) {
-        setStatus(
-          `Processed ${parseResult.data.length} candidates (${parseResult.filteredCount} test candidates filtered out)...`
-        )
-      } else {
-        setStatus(`Processed ${parseResult.data.length} candidates...`)
-      }
-
-      // Simulate processing time for better UX
+      // Simulate processing progress for better UX
+      setProgress(50)
+      setStatus('Processing conversations...')
       await new Promise((resolve) => setTimeout(resolve, 500))
 
-      setProgress(60)
-      setStatus('Organizing conversation data...')
-
-      // Calculate metrics
-      const totalMessages = parseResult.data.reduce((sum, conv) => sum + conv.messageCount, 0)
       setProgress(80)
-      setStatus(`Analyzed ${totalMessages} messages...`)
-
+      setStatus('Finalizing data...')
       await new Promise((resolve) => setTimeout(resolve, 500))
 
       setProgress(100)
@@ -172,6 +157,8 @@ export const UploadPage = ({ onDataProcessed }: UploadPageProps) => {
             <CSVLoadingProgress
               fileName={currentFile.name}
               fileSize={currentFile.size}
+              progress={progress}
+              status={status}
             />
           )
         )}

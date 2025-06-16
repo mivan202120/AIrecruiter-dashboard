@@ -3,11 +3,21 @@ import { useEffect, useState } from 'react'
 interface CSVLoadingProgressProps {
   fileName: string
   fileSize: number
+  progress?: number
+  status?: string
 }
 
-export const CSVLoadingProgress = ({ fileName, fileSize }: CSVLoadingProgressProps) => {
-  const [progress, setProgress] = useState(0)
+export const CSVLoadingProgress = ({
+  fileName,
+  fileSize,
+  progress: externalProgress,
+  status: externalStatus,
+}: CSVLoadingProgressProps) => {
+  const [internalProgress, setInternalProgress] = useState(0)
   const [stage, setStage] = useState<'reading' | 'parsing' | 'validating' | 'complete'>('reading')
+
+  // Use external progress if provided, otherwise use internal
+  const progress = externalProgress !== undefined ? externalProgress : internalProgress
 
   useEffect(() => {
     // Simulate progress
@@ -19,13 +29,13 @@ export const CSVLoadingProgress = ({ fileName, fileSize }: CSVLoadingProgressPro
     ]
 
     let currentStageIndex = 0
-    
+
     const advanceStage = () => {
       if (currentStageIndex < stages.length) {
         const currentStage = stages[currentStageIndex]
         setStage(currentStage.stage)
-        setProgress(currentStage.progress)
-        
+        setInternalProgress(currentStage.progress)
+
         if (currentStageIndex < stages.length - 1) {
           setTimeout(() => {
             currentStageIndex++
@@ -48,23 +58,38 @@ export const CSVLoadingProgress = ({ fileName, fileSize }: CSVLoadingProgressPro
     reading: 'Reading CSV file...',
     parsing: 'Parsing conversation data...',
     validating: 'Validating data format...',
-    complete: 'Processing complete!'
+    complete: 'Processing complete!',
   }
 
   const stageIcons = {
     reading: (
       <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={2}
+          d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+        />
       </svg>
     ),
     parsing: (
       <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4" />
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={2}
+          d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4"
+        />
       </svg>
     ),
     validating: (
       <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={2}
+          d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+        />
       </svg>
     ),
     complete: (
@@ -111,7 +136,9 @@ export const CSVLoadingProgress = ({ fileName, fileSize }: CSVLoadingProgressPro
           <div className="space-y-2">
             <div className="flex justify-between items-center">
               <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Progress</span>
-              <span className="text-sm font-bold text-blue-600 dark:text-blue-400">{progress}%</span>
+              <span className="text-sm font-bold text-blue-600 dark:text-blue-400">
+                {progress}%
+              </span>
             </div>
             <div className="relative h-3 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
               <div
@@ -129,7 +156,7 @@ export const CSVLoadingProgress = ({ fileName, fileSize }: CSVLoadingProgressPro
               {stageIcons[stage]}
             </div>
             <p className="text-gray-700 dark:text-gray-300 font-medium">
-              {stageMessages[stage]}
+              {externalStatus || stageMessages[stage]}
             </p>
           </div>
 
@@ -137,9 +164,10 @@ export const CSVLoadingProgress = ({ fileName, fileSize }: CSVLoadingProgressPro
           <div className="flex justify-between items-center">
             {Object.entries(stageMessages).map(([key, label], index) => {
               const isActive = key === stage
-              const isComplete = ['reading', 'parsing', 'validating', 'complete'].indexOf(key) <= 
-                               ['reading', 'parsing', 'validating', 'complete'].indexOf(stage)
-              
+              const isComplete =
+                ['reading', 'parsing', 'validating', 'complete'].indexOf(key) <=
+                ['reading', 'parsing', 'validating', 'complete'].indexOf(stage)
+
               return (
                 <div key={key} className="flex items-center">
                   <div className="flex flex-col items-center">
@@ -147,9 +175,10 @@ export const CSVLoadingProgress = ({ fileName, fileSize }: CSVLoadingProgressPro
                       className={`
                         w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold
                         transition-all duration-300
-                        ${isComplete 
-                          ? 'bg-blue-500 text-white' 
-                          : 'bg-gray-200 dark:bg-gray-700 text-gray-500 dark:text-gray-400'
+                        ${
+                          isComplete
+                            ? 'bg-blue-500 text-white'
+                            : 'bg-gray-200 dark:bg-gray-700 text-gray-500 dark:text-gray-400'
                         }
                         ${isActive ? 'ring-4 ring-blue-200 dark:ring-blue-800' : ''}
                       `}
@@ -161,7 +190,7 @@ export const CSVLoadingProgress = ({ fileName, fileSize }: CSVLoadingProgressPro
                     </span>
                   </div>
                   {index < Object.entries(stageMessages).length - 1 && (
-                    <div 
+                    <div
                       className={`
                         w-12 h-0.5 mx-1 transition-all duration-300
                         ${isComplete ? 'bg-blue-500' : 'bg-gray-300 dark:bg-gray-600'}

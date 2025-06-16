@@ -29,17 +29,17 @@ const STAGE_PATTERNS = {
       /equipo.*factor.*humano|equipo.*HR|HR.*team|human.*resources/i,
       /horarios.*que.*tenemos|slots.*available|times.*available/i,
       /estos.*son.*los.*horarios|these.*are.*the.*times/i,
-      
+
       // Date and time patterns
-      /\d{1,2}\/\d{1,2}\/\d{4}/,  // Date format DD/MM/YYYY
-      /\d{1,2}:\d{2}\s*a\s*\d{1,2}:\d{2}/,  // Time range format
+      /\d{1,2}\/\d{1,2}\/\d{4}/, // Date format DD/MM/YYYY
+      /\d{1,2}:\d{2}\s*a\s*\d{1,2}:\d{2}/, // Time range format
       /hora.*de.*CDMX|hora.*de.*\w+|timezone/i,
-      
+
       // Response request patterns
       /responde.*con.*el.*número|respond.*with.*number/i,
       /opción.*que.*te.*funciona|option.*that.*works/i,
       /ej\.\s*1.*2.*3.*4|e\.g\.\s*1.*2.*3.*4/i,
-      
+
       // General scheduling patterns
       /available.*slots?|available.*times?|following.*dates?|following.*times?/i,
       /schedule.*interview|book.*interview|arrange.*meeting|set.*up.*interview/i,
@@ -48,7 +48,7 @@ const STAGE_PATTERNS = {
       /\d{1,2}:\d{2}\s*(am|pm|AM|PM)|morning|afternoon|evening/i,
       /please.*confirm|let.*know.*works|choose.*slot|select.*time/i,
       /por.*favor.*responde|please.*respond/i,
-      
+
       // Implicit scheduling patterns (for backwards compatibility)
       /we'll.*be.*in.*touch|we.*will.*contact.*you/i,
       /get.*back.*to.*you|reach.*out.*soon/i,
@@ -67,20 +67,20 @@ const STAGE_PATTERNS = {
       /proceder.*a.*agendar|proceed.*to.*schedule/i,
       /te.*enviaré.*una.*invitación|send.*you.*invitation/i,
       /enviaré.*invitación.*email|send.*invitation.*email/i,
-      
+
       // Calendar confirmation patterns
       /agendada.*exitosamente|successfully.*scheduled/i,
       /confirmada.*tu.*entrevista|confirmed.*your.*interview/i,
       /invitación.*calendario|calendar.*invitation/i,
       /nos.*vemos.*pronto.*entrevista|see.*you.*soon.*interview/i,
       /gracias.*por.*confirmar|thanks.*for.*confirming/i,
-      
+
       // Email and meeting patterns
       /invitación.*al.*email|invitation.*to.*email/i,
       /recibirás.*confirmación|receive.*confirmation/i,
       /meeting.*scheduled|reunión.*agendada/i,
       /appointment.*confirmed|cita.*confirmada/i,
-      
+
       // Generic completion patterns
       /interview.*scheduled|entrevista.*agendada/i,
       /booking.*confirmed|reserva.*confirmada/i,
@@ -95,7 +95,7 @@ export const analyzeConversationStages = (
 ): CandidateFunnelData => {
   console.log('🔍 Analyzing conversation for:', conversation.candidateName)
   console.log('Total messages:', conversation.messages.length)
-  
+
   // Log all AI messages to see what we're working with
   console.log('AI Messages in conversation:')
   conversation.messages.forEach((m, i) => {
@@ -109,7 +109,6 @@ export const analyzeConversationStages = (
   let interviewQuestionCount = 0
   let schedulingProposed = false
   let processCompleted = false
-  let lastAIMessageIndex = -1
 
   // Find first AI message for engagement
   let firstAIMessageFound = false
@@ -119,8 +118,6 @@ export const analyzeConversationStages = (
     const isAI = message.entity === 'AI_RECRUITER'
 
     if (isAI) {
-      lastAIMessageIndex = index
-
       // First AI message is always engagement
       if (!firstAIMessageFound) {
         firstAIMessageFound = true
@@ -145,9 +142,11 @@ export const analyzeConversationStages = (
           }
           return matches
         })
-        
+
         if (completedMatch) {
-          console.log(`  ✅ Stage 4 detected: Completed (AI confirmed interview) at message ${index}`)
+          console.log(
+            `  ✅ Stage 4 detected: Completed (AI confirmed interview) at message ${index}`
+          )
           console.log(`    Message: "${message.message.substring(0, 200)}..."`)
           processCompleted = true
           stages.push({
@@ -165,26 +164,32 @@ export const analyzeConversationStages = (
 
       // Check for scheduling patterns (AI proposes times) - Stage 3
       // Also check if we're late in the conversation (after many questions)
-      const isLateInConversation = interviewQuestionCount >= 5 || index > conversation.messages.length * 0.7
-      
+      const isLateInConversation =
+        interviewQuestionCount >= 5 || index > conversation.messages.length * 0.7
+
       const schedulingMatch = STAGE_PATTERNS.scheduling.patterns.some((pattern) => {
         const matches = pattern.test(message.message)
         if (matches) {
-          console.log(`    🔍 Scheduling pattern matched: ${pattern} in message: "${message.message.substring(0, 100)}..."`)
+          console.log(
+            `    🔍 Scheduling pattern matched: ${pattern} in message: "${message.message.substring(0, 100)}..."`
+          )
         }
         return matches
       })
-      
+
       // More lenient detection for scheduling stage
-      const maybeScheduling = message.message.toLowerCase().includes('next') && 
-                            (message.message.toLowerCase().includes('step') || 
-                             message.message.toLowerCase().includes('interview') ||
-                             message.message.toLowerCase().includes('round'))
-      
+      const maybeScheduling =
+        message.message.toLowerCase().includes('next') &&
+        (message.message.toLowerCase().includes('step') ||
+          message.message.toLowerCase().includes('interview') ||
+          message.message.toLowerCase().includes('round'))
+
       if ((schedulingMatch || (maybeScheduling && isLateInConversation)) && !schedulingProposed) {
         console.log(`  📌 Stage 3 detected: HR Interview Scheduling at message ${index}`)
         console.log(`    Message: "${message.message.substring(0, 200)}..."`)
-        console.log(`    Detected by: ${schedulingMatch ? 'pattern match' : 'context (late conversation + next steps)'}`)
+        console.log(
+          `    Detected by: ${schedulingMatch ? 'pattern match' : 'context (late conversation + next steps)'}`
+        )
         currentStage = 'scheduling'
         schedulingProposed = true
         stages.push({
@@ -224,20 +229,24 @@ export const analyzeConversationStages = (
           })
           currentStage = 'interview'
         } else {
-          console.log(`  ⚠️ Skipping interview question ${interviewQuestionCount + 1} (max 10 reached)`)
+          console.log(
+            `  ⚠️ Skipping interview question ${interviewQuestionCount + 1} (max 10 reached)`
+          )
         }
         return
       }
     } else {
       // User response
-      
+
       // User responds to scheduling (typically with a number)
       if (currentStage === 'scheduling' && schedulingProposed) {
-        console.log(`    🔍 User response after scheduling proposal: "${message.message.substring(0, 100)}..."`)
+        console.log(
+          `    🔍 User response after scheduling proposal: "${message.message.substring(0, 100)}..."`
+        )
         // Mark that user has responded to scheduling
         currentStage = 'scheduling_responded'
       }
-      
+
       // Mark previous stage as completed when user responds
       if (stages.length > 0 && stages[stages.length - 1].type !== 'completed') {
         console.log(`  ✅ Marking stage ${stages[stages.length - 1].name} as completed`)
@@ -251,15 +260,15 @@ export const analyzeConversationStages = (
     const lastAIMessage = conversation.messages
       .slice()
       .reverse()
-      .find(m => m.entity === 'AI_RECRUITER')
+      .find((m) => m.entity === 'AI_RECRUITER')
     const lastUserMessage = conversation.messages[conversation.messages.length - 1]
-    
+
     if (lastAIMessage && lastUserMessage.entity !== 'AI_RECRUITER') {
       // Check if AI indicated future contact
-      const hasImplicitScheduling = STAGE_PATTERNS.scheduling.patterns.some(pattern => 
+      const hasImplicitScheduling = STAGE_PATTERNS.scheduling.patterns.some((pattern) =>
         pattern.test(lastAIMessage.message)
       )
-      
+
       if (hasImplicitScheduling) {
         console.log('  📌 Implicit scheduling detected in final AI message')
         stages.push({
@@ -270,12 +279,12 @@ export const analyzeConversationStages = (
           message: lastAIMessage.message,
           completed: true,
         })
-        
+
         // Check if user responded positively
-        const hasPositiveResponse = STAGE_PATTERNS.completed.patterns.some(pattern =>
+        const hasPositiveResponse = STAGE_PATTERNS.completed.patterns.some((pattern) =>
           pattern.test(lastUserMessage.message)
         )
-        
+
         if (hasPositiveResponse) {
           console.log('  ✅ Implicit completion detected in final user response')
           stages.push({
@@ -303,7 +312,8 @@ export const analyzeConversationStages = (
 
   // Calculate duration from start to last message
   const startTime = conversation.startTime
-  const endTime = conversation.messages[conversation.messages.length - 1]?.timestamp || conversation.endTime
+  const endTime =
+    conversation.messages[conversation.messages.length - 1]?.timestamp || conversation.endTime
   const totalDuration = endTime.getTime() - startTime.getTime()
 
   // Determine if candidate dropped and where
@@ -312,9 +322,9 @@ export const analyzeConversationStages = (
   if (lastStage && !lastStage.completed && lastStage.type !== 'completed') {
     droppedAt = lastStage.name
   }
-  
+
   // Process is completed when we have a 'completed' stage
-  const hasCompletedStage = stages.some(stage => stage.type === 'completed')
+  const hasCompletedStage = stages.some((stage) => stage.type === 'completed')
 
   return {
     candidateId: conversation.candidateId,
@@ -323,7 +333,9 @@ export const analyzeConversationStages = (
     currentStage: stages[stages.length - 1]?.name || 'Unknown',
     decisionMade: hasCompletedStage,
     decisionType: hasCompletedStage ? 'PASS' : undefined,
-    decisionTimestamp: hasCompletedStage ? stages.find(s => s.type === 'completed')?.timestamp : undefined,
+    decisionTimestamp: hasCompletedStage
+      ? stages.find((s) => s.type === 'completed')?.timestamp
+      : undefined,
     totalDuration,
     droppedAt,
   }
@@ -346,7 +358,12 @@ export const calculateFunnelMetrics = (
   >()
 
   // Initialize main stages (4 stages now)
-  const mainStages = ['AI Engagement', 'Interview Questions', 'HR Interview Scheduling', 'Completed']
+  const mainStages = [
+    'AI Engagement',
+    'Interview Questions',
+    'HR Interview Scheduling',
+    'Completed',
+  ]
   mainStages.forEach((stage) => {
     stageMetricsMap.set(stage, {
       entered: new Set(),
@@ -385,7 +402,7 @@ export const calculateFunnelMetrics = (
             console.log(`    Time in stage ${stage.name}: ${timeInStage}ms`)
           }
         }
-        
+
         // Update previous time for next calculation
         if (!stage.id.includes('simulated')) {
           previousStageTime = stage.timestamp.getTime()
@@ -405,7 +422,7 @@ export const calculateFunnelMetrics = (
           if (stage.completed) {
             subMetrics.completed.add(funnel.candidateId)
           }
-          
+
           // For substages, use the same time calculation
           if (timeInStage > 0) {
             subMetrics.times.push(timeInStage)
@@ -457,7 +474,7 @@ export const calculateFunnelMetrics = (
               : 0,
         }
       })
-      .filter(subStage => subStage.questionNumber <= 10) // Only keep questions 1-10
+      .filter((subStage) => subStage.questionNumber <= 10) // Only keep questions 1-10
       .sort((a, b) => a.questionNumber - b.questionNumber) // Sort numerically
 
     return {

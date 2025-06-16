@@ -23,13 +23,15 @@ export const ConversationViewer = ({
       console.log('ConversationViewer - Candidate object:', candidate)
       console.log('ConversationViewer - Available conversations:', Array.from(conversations.keys()))
       console.log('ConversationViewer - Conversations size:', conversations.size)
-      
+
       // Try different ways to find the messages
       let candidateMessages = conversations.get(candidate.candidateId) || []
-      
+
       if (candidateMessages.length === 0) {
-        console.log('ConversationViewer - No messages found with candidateId, checking all conversations')
-        
+        console.log(
+          'ConversationViewer - No messages found with candidateId, checking all conversations'
+        )
+
         // Log all conversation entries for debugging
         conversations.forEach((msgs, id) => {
           console.log(`  Conversation ID: "${id}", Messages: ${msgs.length}`)
@@ -38,7 +40,7 @@ export const ConversationViewer = ({
             console.log(`    First message fullName: "${msgs[0].fullName}"`)
           }
         })
-        
+
         // Try to find by name match
         const candidateNameLower = candidate.candidateName.toLowerCase()
         conversations.forEach((msgs, id) => {
@@ -48,7 +50,7 @@ export const ConversationViewer = ({
           }
         })
       }
-      
+
       console.log('ConversationViewer - Final messages found:', candidateMessages.length)
       setMessages(candidateMessages)
     }
@@ -107,16 +109,21 @@ export const ConversationViewer = ({
                 </span>
                 <span>•</span>
                 <span>
-                  Duration: <strong>{Math.round(candidate.conversationMetrics.duration / 1000 / 60)} minutes</strong>
+                  Duration:{' '}
+                  <strong>
+                    {Math.round(candidate.conversationMetrics.duration / 1000 / 60)} minutes
+                  </strong>
                 </span>
                 <span>•</span>
-                <span className={`font-semibold ${
-                  candidate.status === 'PASS' 
-                    ? 'text-green-600 dark:text-green-400' 
-                    : candidate.status === 'FAIL' 
-                    ? 'text-red-600 dark:text-red-400' 
-                    : 'text-gray-600 dark:text-gray-400'
-                }`}>
+                <span
+                  className={`font-semibold ${
+                    candidate.status === 'PASS'
+                      ? 'text-green-600 dark:text-green-400'
+                      : candidate.status === 'FAIL'
+                        ? 'text-red-600 dark:text-red-400'
+                        : 'text-gray-600 dark:text-gray-400'
+                  }`}
+                >
                   {candidate.status}
                 </span>
               </div>
@@ -125,8 +132,18 @@ export const ConversationViewer = ({
               onClick={onClose}
               className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
             >
-              <svg className="w-6 h-6 text-gray-500 dark:text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              <svg
+                className="w-6 h-6 text-gray-500 dark:text-gray-400"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M6 18L18 6M6 6l12 12"
+                />
               </svg>
             </button>
           </div>
@@ -135,8 +152,18 @@ export const ConversationViewer = ({
           <div className="flex-1 overflow-y-auto p-6 space-y-4">
             {messages.length === 0 ? (
               <div className="flex flex-col items-center justify-center h-full text-gray-500 dark:text-gray-400">
-                <svg className="w-16 h-16 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+                <svg
+                  className="w-16 h-16 mb-4"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={1.5}
+                    d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"
+                  />
                 </svg>
                 <p className="text-lg">No messages found</p>
                 <p className="text-sm mt-2">This conversation appears to be empty</p>
@@ -146,7 +173,7 @@ export const ConversationViewer = ({
                 {messages.map((message, index) => {
                   const isAI = message.entity === 'AI_RECRUITER'
                   let showDate = false
-                  
+
                   if (index === 0) {
                     showDate = true
                   } else {
@@ -164,20 +191,34 @@ export const ConversationViewer = ({
                           </span>
                         </div>
                       )}
-                      
+
                       <div className={`flex ${getMessageAlignment(isAI)} gap-3`}>
                         {/* Avatar */}
                         <div className="flex-shrink-0">
                           {isAI ? (
                             <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center">
-                              <svg className="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                              <svg
+                                className="w-6 h-6 text-white"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                                stroke="currentColor"
+                              >
+                                <path
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  strokeWidth={2}
+                                  d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
+                                />
                               </svg>
                             </div>
                           ) : (
                             <div className="w-10 h-10 rounded-full bg-gradient-to-br from-green-500 to-teal-600 flex items-center justify-center">
                               <span className="text-white font-semibold">
-                                {candidate.candidateName.split(' ').map(n => n[0]).join('').toUpperCase()}
+                                {candidate.candidateName
+                                  .split(' ')
+                                  .map((n) => n[0])
+                                  .join('')
+                                  .toUpperCase()}
                               </span>
                             </div>
                           )}
@@ -220,13 +261,15 @@ export const ConversationViewer = ({
                 {candidate.sentiment && (
                   <div>
                     <span className="text-gray-500 dark:text-gray-400">Sentiment:</span>
-                    <span className={`ml-2 font-medium ${
-                      candidate.sentiment === 'Positive' 
-                        ? 'text-green-600 dark:text-green-400' 
-                        : candidate.sentiment === 'Negative'
-                        ? 'text-red-600 dark:text-red-400'
-                        : 'text-gray-600 dark:text-gray-400'
-                    }`}>
+                    <span
+                      className={`ml-2 font-medium ${
+                        candidate.sentiment === 'Positive'
+                          ? 'text-green-600 dark:text-green-400'
+                          : candidate.sentiment === 'Negative'
+                            ? 'text-red-600 dark:text-red-400'
+                            : 'text-gray-600 dark:text-gray-400'
+                      }`}
+                    >
                       {candidate.sentiment}
                     </span>
                   </div>

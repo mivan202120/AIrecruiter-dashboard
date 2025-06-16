@@ -54,13 +54,23 @@ export const CandidateCard = ({
             <div className="flex items-center gap-4 text-sm text-gray-500 dark:text-gray-400 group-hover:text-gray-700 dark:group-hover:text-gray-300">
               <span className="flex items-center gap-1">
                 <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-4l-4 4z" />
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-4l-4 4z"
+                  />
                 </svg>
                 {candidate.conversationMetrics.messageCount} messages
               </span>
               <span className="flex items-center gap-1">
                 <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+                  />
                 </svg>
                 {formatDuration(candidate.conversationMetrics.duration)}
               </span>
@@ -68,7 +78,9 @@ export const CandidateCard = ({
           </div>
         </div>
         <div className="flex items-center gap-3">
-          <span className={`px-3 py-1.5 rounded-full text-xs font-medium ${statusColors} transition-all duration-200 group-hover:scale-105 group-hover:shadow-md`}>
+          <span
+            className={`px-3 py-1.5 rounded-full text-xs font-medium ${statusColors} transition-all duration-200 group-hover:scale-105 group-hover:shadow-md`}
+          >
             {statusLabels[candidate.status]}
           </span>
           <svg
@@ -138,7 +150,11 @@ export const CandidateCard = ({
               <button
                 onClick={(e) => {
                   e.stopPropagation()
-                  console.log('CandidateCard - View Conversation clicked for:', candidate.candidateId, candidate.candidateName)
+                  console.log(
+                    'CandidateCard - View Conversation clicked for:',
+                    candidate.candidateId,
+                    candidate.candidateName
+                  )
                   onViewConversation()
                 }}
                 className="w-full px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors flex items-center justify-center gap-2"

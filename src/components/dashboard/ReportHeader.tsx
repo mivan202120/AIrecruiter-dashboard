@@ -1,5 +1,6 @@
 import type { DashboardData } from '../../types'
 import { formatDate } from '../../utils/dateUtils'
+import { PDFDownload } from './PDFDownload'
 
 interface ReportHeaderProps {
   data: DashboardData
@@ -37,6 +38,7 @@ export const ReportHeader = ({ data, onNewUpload, onThemeToggle, isDark }: Repor
               </svg>
               New Upload
             </button>
+            <PDFDownload data={data} />
             <button
               onClick={onThemeToggle}
               className="p-2 bg-white/20 hover:bg-white/30 rounded-lg transition-colors"

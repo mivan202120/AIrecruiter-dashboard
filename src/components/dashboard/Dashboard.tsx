@@ -44,7 +44,10 @@ export const Dashboard = ({
   console.log('Funnel stages:', normalizedData.funnelData?.stages)
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors">
+    <div
+      id="dashboard-content"
+      className="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors"
+    >
       {/* Professional Report Header */}
       <ReportHeader
         data={normalizedData}

@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'react'
-import { ProgressIndicator } from '../common/ProgressIndicator'
 import { processConversations } from '../../services/analysisProcessor'
 import type { CandidateConversation, DashboardData } from '../../types'
 import type { ProcessingProgress } from '../../services/analysisProcessor'
@@ -122,7 +121,9 @@ export const AnalysisProgress = ({ conversations, onComplete }: AnalysisProgress
           <div className="space-y-3">
             <div className="flex justify-between items-center">
               <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Progress</span>
-              <span className="text-sm font-bold text-blue-600 dark:text-blue-400">{Math.round(progress)}%</span>
+              <span className="text-sm font-bold text-blue-600 dark:text-blue-400">
+                {Math.round(progress)}%
+              </span>
             </div>
             <div className="relative h-4 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
               <div
@@ -157,13 +158,13 @@ export const AnalysisProgress = ({ conversations, onComplete }: AnalysisProgress
             </div>
             <div className="text-center p-3 bg-gray-50 dark:bg-gray-900 rounded-lg">
               <p className="text-2xl font-bold text-blue-600 dark:text-blue-400">
-                {Math.floor(progress * conversations.length / 100)}
+                {Math.floor((progress * conversations.length) / 100)}
               </p>
               <p className="text-xs text-gray-600 dark:text-gray-400">Analyzed</p>
             </div>
             <div className="text-center p-3 bg-gray-50 dark:bg-gray-900 rounded-lg">
               <p className="text-2xl font-bold text-purple-600 dark:text-purple-400">
-                {conversations.length - Math.floor(progress * conversations.length / 100)}
+                {conversations.length - Math.floor((progress * conversations.length) / 100)}
               </p>
               <p className="text-xs text-gray-600 dark:text-gray-400">Remaining</p>
             </div>
@@ -173,12 +174,22 @@ export const AnalysisProgress = ({ conversations, onComplete }: AnalysisProgress
         {/* Info Card */}
         <div className="bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-950 dark:to-purple-950 p-6 rounded-xl">
           <div className="flex items-start space-x-3">
-            <svg className="w-5 h-5 text-blue-600 dark:text-blue-400 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
-              <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
+            <svg
+              className="w-5 h-5 text-blue-600 dark:text-blue-400 mt-0.5"
+              fill="currentColor"
+              viewBox="0 0 20 20"
+            >
+              <path
+                fillRule="evenodd"
+                d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"
+                clipRule="evenodd"
+              />
             </svg>
             <div className="flex-1">
               <p className="text-sm text-gray-700 dark:text-gray-300">
-                <strong className="font-semibold">AI-Powered Analysis:</strong> Each conversation is being analyzed across multiple dimensions including technical skills, communication, and cultural fit.
+                <strong className="font-semibold">AI-Powered Analysis:</strong> Each conversation is
+                being analyzed across multiple dimensions including technical skills, communication,
+                and cultural fit.
               </p>
             </div>
           </div>

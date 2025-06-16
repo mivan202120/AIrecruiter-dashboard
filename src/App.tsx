@@ -16,7 +16,9 @@ function createConversationsMap(
   console.log('Creating conversations map from:', conversations.length, 'conversations')
   const map = new Map<string, ParsedMessage[]>()
   conversations.forEach((conv) => {
-    console.log(`  Adding conversation: candidateId="${conv.candidateId}", messages=${conv.messages.length}`)
+    console.log(
+      `  Adding conversation: candidateId="${conv.candidateId}", messages=${conv.messages.length}`
+    )
     map.set(conv.candidateId, conv.messages)
   })
   console.log('Created map with', map.size, 'entries')
