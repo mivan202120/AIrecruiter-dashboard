@@ -43,14 +43,15 @@ export const DetailedMetricsTable = ({ candidates }: DetailedMetricsTableProps) 
         aValue = a.conversationMetrics.duration
         bValue = b.conversationMetrics.duration
         break
-      case 'startTime':
+      case 'startTime': {
         // Ensure dates are Date objects before sorting
         const aDate = ensureDate(a.conversationMetrics.startTime)
         const bDate = ensureDate(b.conversationMetrics.startTime)
-        
+
         aValue = aDate.getTime()
         bValue = bDate.getTime()
         break
+      }
     }
 
     if (aValue < bValue) return sortDirection === 'asc' ? -1 : 1

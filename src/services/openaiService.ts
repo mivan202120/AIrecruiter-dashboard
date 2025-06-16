@@ -14,7 +14,7 @@ const initializeOpenAI = async () => {
   if (!apiKeyValidated && apiKey) {
     const validation = await validateOpenAIApiKey(apiKey)
     apiKeyValidated = true
-    
+
     if (validation.isValid) {
       openai = new OpenAI({
         apiKey,
@@ -77,11 +77,14 @@ export const analyzeCandidateConversation = async (
 ): Promise<CandidateAnalysis> => {
   console.log(`Analyzing candidate: ${conversation.candidateName} (${conversation.candidateId})`)
   console.log(`Messages in conversation: ${conversation.messageCount}`)
-  console.log('First few messages:', conversation.messages.slice(0, 3).map(m => ({
-    entity: m.entity,
-    message: m.message.substring(0, 50) + '...'
-  })))
-  
+  console.log(
+    'First few messages:',
+    conversation.messages.slice(0, 3).map((m) => ({
+      entity: m.entity,
+      message: m.message.substring(0, 50) + '...',
+    }))
+  )
+
   const client = await initializeOpenAI()
   if (!client) {
     throw new Error('OpenAI API key not configured or invalid')
@@ -101,6 +104,12 @@ export const analyzeCandidateConversation = async (
     Based on the ENTIRE conversation above, evaluate the candidate across multiple dimensions.
     Consider their responses, engagement level, technical knowledge, communication skills, and overall fit.
     
+    IMPORTANT: Also identify these conversation stages:
+    1. AI Engagement - When AI initiates conversation
+    2. Interview Questions - When AI asks about experience, skills, etc.
+    3. HR Interview Scheduling - When AI proposes specific time slots or dates for HR interview
+    4. Completed - When candidate confirms a specific time slot
+    
     Provide a JSON response with the following structure:
     {
       "overallAssessment": "A comprehensive 2-3 sentence assessment of the candidate",
@@ -117,7 +126,11 @@ export const analyzeCandidateConversation = async (
       "hiringRecommendation": "One of: STRONG_YES, YES, MAYBE, NO, STRONG_NO",
       "nextSteps": "Specific recommendation for next steps",
       "sentiment": "One of: Positive, Negative, Neutral - Overall sentiment of candidate's responses",
-      "rejectionReason": "If hiringRecommendation is NO or STRONG_NO, provide specific reason"
+      "rejectionReason": "If hiringRecommendation is NO or STRONG_NO, provide specific reason",
+      "funnelStages": {
+        "reachedScheduling": true/false - Did AI propose time slots?,
+        "completedProcess": true/false - Did candidate confirm a time slot?
+      }
     }
   `
 
@@ -144,7 +157,10 @@ export const analyzeCandidateConversation = async (
       const content = completion.choices[0]?.message?.content
       if (!content) throw new Error('No response from OpenAI')
 
-      console.log(`OpenAI response for ${conversation.candidateName}:`, content.substring(0, 200) + '...')
+      console.log(
+        `OpenAI response for ${conversation.candidateName}:`,
+        content.substring(0, 200) + '...'
+      )
       return JSON.parse(content)
     })
 
@@ -153,9 +169,15 @@ export const analyzeCandidateConversation = async (
     if (conversation.decision) {
       status = conversation.decision
     } else if (response.hiringRecommendation) {
-      if (response.hiringRecommendation === 'STRONG_YES' || response.hiringRecommendation === 'YES') {
+      if (
+        response.hiringRecommendation === 'STRONG_YES' ||
+        response.hiringRecommendation === 'YES'
+      ) {
         status = 'PASS'
-      } else if (response.hiringRecommendation === 'NO' || response.hiringRecommendation === 'STRONG_NO') {
+      } else if (
+        response.hiringRecommendation === 'NO' ||
+        response.hiringRecommendation === 'STRONG_NO'
+      ) {
         status = 'FAIL'
       }
     }
@@ -169,7 +191,10 @@ export const analyzeCandidateConversation = async (
       conversationMetrics: {
         messageCount: conversation.messageCount,
         duration: conversation.duration,
-        startTime: conversation.startTime instanceof Date ? conversation.startTime : new Date(conversation.startTime),
+        startTime:
+          conversation.startTime instanceof Date
+            ? conversation.startTime
+            : new Date(conversation.startTime),
         tags: conversation.tags || [],
       },
       aiAnalysis: response,
@@ -205,7 +230,8 @@ export const generateAggregateInsights = async (
     avgDuration:
       candidates.reduce((sum, c) => sum + c.conversationMetrics.duration, 0) / candidates.length,
     avgMessages:
-      candidates.reduce((sum, c) => sum + c.conversationMetrics.messageCount, 0) / candidates.length,
+      candidates.reduce((sum, c) => sum + c.conversationMetrics.messageCount, 0) /
+      candidates.length,
   }
 
   const prompt = `

@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Funnel Data</title>
+</head>
+<body>
+    <h1>Funnel Test Data</h1>
+    <p>Open the browser console and run npm run dev to test the funnel with sample data.</p>
+    
+    <script>
+        // Sample conversation data that should trigger all funnel stages
+        const testConversations = [
+            {
+                candidateId: "TEST001",
+                candidateName: "John Doe",
+                messages: [
+                    {
+                        conversation_id: "1",
+                        user_id: "TEST001",
+                        entity: "AI_RECRUITER",
+                        message: "Hello John! Welcome to our interview process. Thanks for joining us today.",
+                        timestamp: new Date("2025-01-14T10:00:00"),
+                        fullName: "John Doe"
+                    },
+                    {
+                        conversation_id: "2",
+                        user_id: "TEST001",
+                        entity: "CANDIDATE",
+                        message: "Hi! Thanks for having me.",
+                        timestamp: new Date("2025-01-14T10:01:00"),
+                        fullName: "John Doe"
+                    },
+                    {
+                        conversation_id: "3",
+                        user_id: "TEST001",
+                        entity: "AI_RECRUITER",
+                        message: "Can you tell me about your experience with React and TypeScript?",
+                        timestamp: new Date("2025-01-14T10:02:00"),
+                        fullName: "John Doe"
+                    },
+                    {
+                        conversation_id: "4",
+                        user_id: "TEST001",
+                        entity: "CANDIDATE",
+                        message: "I have 3 years of experience with React...",
+                        timestamp: new Date("2025-01-14T10:05:00"),
+                        fullName: "John Doe"
+                    },
+                    {
+                        conversation_id: "5",
+                        user_id: "TEST001",
+                        entity: "AI_RECRUITER",
+                        message: "How do you approach debugging complex issues?",
+                        timestamp: new Date("2025-01-14T10:06:00"),
+                        fullName: "John Doe"
+                    },
+                    {
+                        conversation_id: "6",
+                        user_id: "TEST001",
+                        entity: "CANDIDATE",
+                        message: "I use systematic approach...",
+                        timestamp: new Date("2025-01-14T10:08:00"),
+                        fullName: "John Doe"
+                    },
+                    {
+                        conversation_id: "7",
+                        user_id: "TEST001",
+                        entity: "AI_RECRUITER",
+                        message: "Great! Let's schedule your HR interview. Are you available next week?",
+                        timestamp: new Date("2025-01-14T10:10:00"),
+                        fullName: "John Doe"
+                    },
+                    {
+                        conversation_id: "8",
+                        user_id: "TEST001",
+                        entity: "CANDIDATE",
+                        message: "Yes, I'm available Tuesday or Thursday.",
+                        timestamp: new Date("2025-01-14T10:11:00"),
+                        fullName: "John Doe"
+                    },
+                    {
+                        conversation_id: "9",
+                        user_id: "TEST001",
+                        entity: "AI_RECRUITER",
+                        message: "Congratulations! We're pleased to move forward with your application.",
+                        timestamp: new Date("2025-01-14T10:12:00"),
+                        fullName: "John Doe"
+                    }
+                ],
+                messageCount: 9,
+                duration: 720000, // 12 minutes
+                startTime: new Date("2025-01-14T10:00:00"),
+                endTime: new Date("2025-01-14T10:12:00"),
+                decision: "PASS"
+            }
+        ];
+        
+        console.log("Test conversation data ready:", testConversations);
+        console.log("To test: Upload a CSV file or modify the code to use this test data");
+    </script>
+</body>
+</html>

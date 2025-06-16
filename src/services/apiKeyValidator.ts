@@ -13,9 +13,11 @@ export const clearValidationCache = () => {
   validationCache.clear()
 }
 
-export const validateOpenAIApiKey = async (apiKey: string | undefined): Promise<ApiKeyValidation> => {
+export const validateOpenAIApiKey = async (
+  apiKey: string | undefined
+): Promise<ApiKeyValidation> => {
   console.log('Validating OpenAI API key...')
-  
+
   // Check cache first
   if (apiKey) {
     const cached = validationCache.get(apiKey)
@@ -48,7 +50,7 @@ export const validateOpenAIApiKey = async (apiKey: string | undefined): Promise<
       error: 'Invalid API key format (must start with "sk-")',
     }
   }
-  
+
   // Check key length (OpenAI keys are typically around 51 characters)
   if (apiKey.length < 40 || apiKey.length > 200) {
     console.log('API key has unusual length:', apiKey.length)
@@ -68,19 +70,19 @@ export const validateOpenAIApiKey = async (apiKey: string | undefined): Promise<
     // Make a minimal API call to verify the key works
     console.log('Testing API key with models.list()...')
     await openai.models.list()
-    
+
     console.log('API key is valid!')
     const result = { isValid: true }
-    
+
     // Cache the successful validation
     if (apiKey) {
       validationCache.set(apiKey, { result, timestamp: Date.now() })
     }
-    
+
     return result
   } catch (error) {
     let result: ApiKeyValidation
-    
+
     if (error instanceof Error) {
       if (error.message.includes('401')) {
         result = {
@@ -109,15 +111,15 @@ export const validateOpenAIApiKey = async (apiKey: string | undefined): Promise<
         error: 'Failed to validate API key',
       }
     }
-    
+
     // Cache failed validations too (with shorter duration)
     if (apiKey && !result.isValid) {
-      validationCache.set(apiKey, { 
-        result, 
-        timestamp: Date.now() - (CACHE_DURATION - 60000) // Only cache for 1 minute
+      validationCache.set(apiKey, {
+        result,
+        timestamp: Date.now() - (CACHE_DURATION - 60000), // Only cache for 1 minute
       })
     }
-    
+
     return result
   }
 }

@@ -5,7 +5,7 @@ export const calculateDailyConversations = (
   candidates: CandidateAnalysis[]
 ): DailyConversationCount[] => {
   console.log('Calculating daily conversations for', candidates.length, 'candidates')
-  
+
   // Group conversations by date
   const dailyMap = new Map<string, { count: number; candidates: string[] }>()
 
@@ -13,7 +13,7 @@ export const calculateDailyConversations = (
     const startTime = ensureDate(candidate.conversationMetrics.startTime)
     // Format date as YYYY-MM-DD for grouping
     const dateKey = startTime.toISOString().split('T')[0]
-    
+
     console.log(`Candidate ${candidate.candidateName}: ${startTime} -> ${dateKey}`)
 
     const existing = dailyMap.get(dateKey) || { count: 0, candidates: [] }

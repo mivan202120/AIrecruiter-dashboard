@@ -6,22 +6,29 @@ interface ProcessMetricsProps {
 }
 
 export const ProcessMetrics = ({ data }: ProcessMetricsProps) => {
-  const avgDuration = data.candidates.length > 0
-    ? data.candidates.reduce((sum, c) => sum + c.conversationMetrics.duration, 0) /
-      data.candidates.length
-    : 0
+  const avgDuration =
+    data.candidates.length > 0
+      ? data.candidates.reduce((sum, c) => sum + c.conversationMetrics.duration, 0) /
+        data.candidates.length
+      : 0
 
-  const fastestConversation = data.candidates.length > 0
-    ? data.candidates.reduce((fastest, current) =>
-        current.conversationMetrics.duration < fastest.conversationMetrics.duration ? current : fastest
-      )
-    : null
+  const fastestConversation =
+    data.candidates.length > 0
+      ? data.candidates.reduce((fastest, current) =>
+          current.conversationMetrics.duration < fastest.conversationMetrics.duration
+            ? current
+            : fastest
+        )
+      : null
 
-  const longestConversation = data.candidates.length > 0
-    ? data.candidates.reduce((longest, current) =>
-        current.conversationMetrics.duration > longest.conversationMetrics.duration ? current : longest
-      )
-    : null
+  const longestConversation =
+    data.candidates.length > 0
+      ? data.candidates.reduce((longest, current) =>
+          current.conversationMetrics.duration > longest.conversationMetrics.duration
+            ? current
+            : longest
+        )
+      : null
 
   const metrics = [
     {
@@ -41,13 +48,17 @@ export const ProcessMetrics = ({ data }: ProcessMetricsProps) => {
     },
     {
       label: 'Fastest Conversation',
-      value: fastestConversation ? formatDuration(fastestConversation.conversationMetrics.duration) : 'N/A',
+      value: fastestConversation
+        ? formatDuration(fastestConversation.conversationMetrics.duration)
+        : 'N/A',
       sublabel: fastestConversation?.candidateName,
       icon: '🚀',
     },
     {
       label: 'Longest Conversation',
-      value: longestConversation ? formatDuration(longestConversation.conversationMetrics.duration) : 'N/A',
+      value: longestConversation
+        ? formatDuration(longestConversation.conversationMetrics.duration)
+        : 'N/A',
       sublabel: longestConversation?.candidateName,
       icon: '🐌',
     },

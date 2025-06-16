@@ -1,4 +1,4 @@
-import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Legend } from 'recharts'
+import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from 'recharts'
 import type { DashboardData } from '../../types'
 
 interface ResultsDistributionProps {
@@ -11,6 +11,16 @@ const COLORS = {
   noResponse: '#6b7280',
 }
 
+interface CustomLabelProps {
+  cx: number
+  cy: number
+  midAngle: number
+  innerRadius: number
+  outerRadius: number
+  percent: number
+  count: number
+}
+
 const CustomLabel = ({
   cx,
   cy,
@@ -19,7 +29,7 @@ const CustomLabel = ({
   outerRadius,
   percent,
   count,
-}: any) => {
+}: CustomLabelProps) => {
   const RADIAN = Math.PI / 180
   const radius = innerRadius + (outerRadius - innerRadius) * 0.5
   const x = cx + radius * Math.cos(-midAngle * RADIAN)
@@ -63,10 +73,10 @@ export const ResultsDistribution = ({ data }: ResultsDistributionProps) => {
       percentage: (statusDistribution.noResponse / totalUsers) * 100,
       color: COLORS.noResponse,
     },
-  ].filter(item => item.value > 0) // Only show segments with data
+  ].filter((item) => item.value > 0) // Only show segments with data
 
-  const renderCustomizedLabel = (props: any) => {
-    const item = pieData.find(d => d.name === props.name)
+  const renderCustomizedLabel = (props: CustomLabelProps & { name: string }) => {
+    const item = pieData.find((d) => d.name === props.name)
     return <CustomLabel {...props} count={item?.value || 0} />
   }
 
@@ -105,10 +115,7 @@ export const ResultsDistribution = ({ data }: ResultsDistributionProps) => {
                   borderRadius: '6px',
                   padding: '8px 12px',
                 }}
-                formatter={(value: number, name: string) => [
-                  `${value} candidates`,
-                  name,
-                ]}
+                formatter={(value: number, name: string) => [`${value} candidates`, name]}
               />
             </PieChart>
           </ResponsiveContainer>
@@ -122,14 +129,9 @@ export const ResultsDistribution = ({ data }: ResultsDistributionProps) => {
               className="flex items-center justify-between p-4 rounded-lg bg-gray-50 dark:bg-gray-900"
             >
               <div className="flex items-center gap-3">
-                <div
-                  className="w-4 h-4 rounded-full"
-                  style={{ backgroundColor: item.color }}
-                />
+                <div className="w-4 h-4 rounded-full" style={{ backgroundColor: item.color }} />
                 <div>
-                  <p className="font-medium text-gray-900 dark:text-gray-100">
-                    {item.name}
-                  </p>
+                  <p className="font-medium text-gray-900 dark:text-gray-100">{item.name}</p>
                   <p className="text-sm text-gray-600 dark:text-gray-400">
                     {item.value} {item.value === 1 ? 'candidate' : 'candidates'}
                   </p>
@@ -147,19 +149,19 @@ export const ResultsDistribution = ({ data }: ResultsDistributionProps) => {
           <div className="pt-4 mt-4 border-t border-gray-200 dark:border-gray-700">
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <p className="text-sm text-gray-600 dark:text-gray-400">
-                  Success Rate
-                </p>
+                <p className="text-sm text-gray-600 dark:text-gray-400">Success Rate</p>
                 <p className="text-lg font-semibold text-green-600 dark:text-green-400">
                   {((statusDistribution.approved / totalUsers) * 100).toFixed(1)}%
                 </p>
               </div>
               <div>
-                <p className="text-sm text-gray-600 dark:text-gray-400">
-                  Response Rate
-                </p>
+                <p className="text-sm text-gray-600 dark:text-gray-400">Response Rate</p>
                 <p className="text-lg font-semibold text-blue-600 dark:text-blue-400">
-                  {(((statusDistribution.approved + statusDistribution.rejected) / totalUsers) * 100).toFixed(1)}%
+                  {(
+                    ((statusDistribution.approved + statusDistribution.rejected) / totalUsers) *
+                    100
+                  ).toFixed(1)}
+                  %
                 </p>
               </div>
             </div>

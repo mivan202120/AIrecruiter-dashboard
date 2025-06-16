@@ -7,13 +7,28 @@ import { Dashboard } from './components/dashboard/Dashboard'
 import { useApiKey } from './hooks/useApiKey'
 import { processWithoutAI } from './services/basicAnalysisProcessor'
 import { normalizeDashboardData } from './utils/dataHelpers'
-import type { CandidateConversation, DashboardData } from './types'
+import type { CandidateConversation, DashboardData, ParsedMessage } from './types'
+
+// Helper function to create conversations map
+function createConversationsMap(
+  conversations: CandidateConversation[]
+): Map<string, ParsedMessage[]> {
+  console.log('Creating conversations map from:', conversations.length, 'conversations')
+  const map = new Map<string, ParsedMessage[]>()
+  conversations.forEach((conv) => {
+    console.log(`  Adding conversation: candidateId="${conv.candidateId}", messages=${conv.messages.length}`)
+    map.set(conv.candidateId, conv.messages)
+  })
+  console.log('Created map with', map.size, 'entries')
+  console.log('Map keys:', Array.from(map.keys()))
+  return map
+}
 
 function AppContent() {
   const [isDark, setIsDark] = useState(false)
   const [isAnalyzing, setIsAnalyzing] = useState(false)
   const { rawData, dashboardData, setRawData, setDashboardData, clearData } = useData()
-  const { isConfigured, isValidating } = useApiKey()
+  const { isConfigured } = useApiKey()
 
   const handleDataProcessed = async (data: CandidateConversation[]) => {
     setRawData(data)
@@ -54,6 +69,7 @@ function AppContent() {
       ) : dashboardData ? (
         <Dashboard
           data={dashboardData}
+          conversations={createConversationsMap(rawData)}
           isDark={isDark}
           onThemeToggle={() => setIsDark(!isDark)}
           onNewUpload={handleNewUpload}

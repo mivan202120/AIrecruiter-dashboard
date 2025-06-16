@@ -64,9 +64,7 @@ export const SentimentAnalysis = ({ candidates }: SentimentAnalysisProps) => {
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <span className="text-2xl">{colors.icon}</span>
-                  <span className="font-medium text-gray-900 dark:text-gray-100">
-                    {sentiment}
-                  </span>
+                  <span className="font-medium text-gray-900 dark:text-gray-100">{sentiment}</span>
                 </div>
                 <div className="text-right">
                   <span className="text-lg font-semibold text-gray-900 dark:text-gray-100">
@@ -83,8 +81,8 @@ export const SentimentAnalysis = ({ candidates }: SentimentAnalysisProps) => {
                     sentiment === 'Positive'
                       ? 'bg-green-500'
                       : sentiment === 'Negative'
-                      ? 'bg-red-500'
-                      : 'bg-gray-500'
+                        ? 'bg-red-500'
+                        : 'bg-gray-500'
                   }`}
                   style={{ width: `${percentage}%` }}
                 />
@@ -116,10 +114,7 @@ export const SentimentAnalysis = ({ candidates }: SentimentAnalysisProps) => {
             )[0]
 
             return (
-              <div
-                key={status}
-                className="text-center p-3 rounded-lg bg-gray-50 dark:bg-gray-900"
-              >
+              <div key={status} className="text-center p-3 rounded-lg bg-gray-50 dark:bg-gray-900">
                 <p className="font-medium text-gray-700 dark:text-gray-300">
                   {status === 'PASS' ? 'Approved' : status === 'FAIL' ? 'Rejected' : 'No Response'}
                 </p>

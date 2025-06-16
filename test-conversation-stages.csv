@@ -1,0 +1,16 @@
+MessageID,CandidateID,Entity,Message,Date,FullName
+1,test001,AI_RECRUITER,"Hello! Welcome to our interview process. I'm excited to learn more about you.",06/16/2025 10:00 am,Test Candidate
+2,test001,CANDIDATE,"Hi! Thanks for having me. I'm excited to be here.",06/16/2025 10:01 am,Test Candidate
+3,test001,AI_RECRUITER,"Great! Can you tell me about your experience with React and TypeScript?",06/16/2025 10:02 am,Test Candidate
+4,test001,CANDIDATE,"I have 5 years of experience with React and 3 years with TypeScript. I've built several production applications.",06/16/2025 10:03 am,Test Candidate
+5,test001,AI_RECRUITER,"That's impressive! How do you handle state management in large React applications?",06/16/2025 10:04 am,Test Candidate
+6,test001,CANDIDATE,"I typically use Redux for complex state management, but I also like Context API for simpler cases.",06/16/2025 10:05 am,Test Candidate
+7,test001,AI_RECRUITER,"Excellent answers! Based on your experience, I'd like to move forward with scheduling an HR interview. I have the following time slots available next week: Monday at 2:00 PM, Tuesday at 10:00 AM, or Thursday at 3:30 PM. Please let me know which works best for you.",06/16/2025 10:06 am,Test Candidate
+8,test001,CANDIDATE,"Tuesday at 10:00 AM works perfectly for me. Looking forward to it!",06/16/2025 10:07 am,Test Candidate
+9,test001,AI_RECRUITER,"Perfect! I've confirmed your HR interview for Tuesday at 10:00 AM. You'll receive a calendar invite shortly. Good luck!",06/16/2025 10:08 am,Test Candidate
+10,test002,AI_RECRUITER,"Hi there! Welcome to our technical screening. Let's start with your background.",06/16/2025 11:00 am,Another Candidate
+11,test002,CANDIDATE,"Hello! I'm a full-stack developer with 7 years of experience.",06/16/2025 11:01 am,Another Candidate
+12,test002,AI_RECRUITER,"Great! What programming languages are you most comfortable with?",06/16/2025 11:02 am,Another Candidate
+13,test002,CANDIDATE,"I'm proficient in JavaScript, Python, and Java.",06/16/2025 11:03 am,Another Candidate
+14,test002,AI_RECRUITER,"Good to know. Based on our conversation, I'd like to schedule an interview with our hiring manager. Are you available next Wednesday afternoon or Friday morning?",06/16/2025 11:04 am,Another Candidate
+15,test002,CANDIDATE,"Yes, Friday morning works great for me!",06/16/2025 11:05 am,Another Candidate

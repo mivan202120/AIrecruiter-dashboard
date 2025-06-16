@@ -3,6 +3,7 @@ import type { CSVRow, ParsedMessage, CandidateConversation } from '../types'
 import { validateCSVHeaders } from '../utils/validators'
 import { parseDate } from '../utils/dateUtils'
 import { ENTITY_MAPPING } from '../constants'
+import { filterTestCandidates, getFilteringStats } from '../utils/filterTestCandidates'
 
 export interface ParseResult {
   success: boolean
@@ -10,6 +11,8 @@ export interface ParseResult {
   error?: string
   totalRows?: number
   errorRows?: number
+  filteredCount?: number
+  filteredCandidates?: Array<{ id: string; name: string }>
 }
 
 export const parseCSVFile = (file: File): Promise<ParseResult> => {
@@ -42,7 +45,7 @@ const processCSVData = (rows: CSVRow[], headers: string[]): ParseResult => {
   console.log('Processing CSV data with headers:', headers)
   console.log('Total rows to process:', rows.length)
   console.log('First row sample:', rows[0])
-  
+
   // Validate headers
   const headerValidation = validateCSVHeaders(headers)
   if (!headerValidation.isValid) {
@@ -63,7 +66,7 @@ const processCSVData = (rows: CSVRow[], headers: string[]): ParseResult => {
       if (index < 3 || !row.Date || !row.Entity || !row.CandidateID) {
         console.log(`Row ${index + 2}:`, row)
       }
-      
+
       const entity = ENTITY_MAPPING[row.Entity as keyof typeof ENTITY_MAPPING]
       if (!entity) {
         console.warn(`Invalid entity "${row.Entity}" at row ${index + 2}`)
@@ -122,17 +125,32 @@ const processCSVData = (rows: CSVRow[], headers: string[]): ParseResult => {
   console.log('- Parsed messages:', parsedMessages.length)
   console.log('- Error rows:', errorRows.length)
   console.log('- Conversations created:', conversations.length)
-  console.log('- Conversations:', conversations.map(c => ({
-    candidateId: c.candidateId,
-    name: c.candidateName,
-    messages: c.messageCount,
-    duration: c.duration
-  })))
+
+  // Filter out test candidates
+  const filteredConversations = filterTestCandidates(conversations)
+
+  // Log filtering statistics
+  const filterStats = getFilteringStats(conversations, filteredConversations)
+  if (filterStats.removedCount > 0) {
+    console.log('🧹 Test candidates removed:', filterStats.removedCandidates)
+  }
+
+  console.log(
+    '- Final conversations after filtering:',
+    filteredConversations.map((c) => ({
+      candidateId: c.candidateId,
+      name: c.candidateName,
+      messages: c.messageCount,
+      duration: c.duration,
+    }))
+  )
 
   return {
     success: true,
-    data: conversations,
+    data: filteredConversations,
     totalRows: rows.length,
     errorRows: errorRows.length,
+    filteredCount: filterStats.removedCount,
+    filteredCandidates: filterStats.removedCandidates.map((c) => ({ id: c.id, name: c.name })),
   }
 }

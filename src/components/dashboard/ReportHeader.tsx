@@ -63,9 +63,7 @@ export const ReportHeader = ({ data, onNewUpload, onThemeToggle, isDark }: Repor
               )}
             </button>
           </div>
-          <div className="text-sm opacity-90">
-            Generated: {formatDate(data.processedAt)}
-          </div>
+          <div className="text-sm opacity-90">Generated: {formatDate(data.processedAt)}</div>
         </div>
 
         {/* Main Title */}

@@ -99,6 +99,8 @@ export interface ProcessingMetrics {
   apiCalls?: number
 }
 
+import type { ConversationFunnelData } from './funnel'
+
 export interface DashboardData {
   totalMessages: number
   totalUsers: number
@@ -112,4 +114,5 @@ export interface DashboardData {
   }
   dailyConversations: DailyConversationCount[]
   processingMetrics?: ProcessingMetrics
+  funnelData?: ConversationFunnelData
 }

@@ -1,12 +1,4 @@
-import {
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  ResponsiveContainer,
-} from 'recharts'
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts'
 import type { DailyConversationCount } from '../../types'
 import { formatDateForDisplay } from '../../utils/conversationStats'
 
@@ -73,10 +65,7 @@ export const DailyConversationsChart = ({ data, isDark }: DailyConversationsChar
 
       <div className="h-64">
         <ResponsiveContainer width="100%" height="100%">
-          <BarChart
-            data={chartData}
-            margin={{ top: 10, right: 10, left: 0, bottom: 20 }}
-          >
+          <BarChart data={chartData} margin={{ top: 10, right: 10, left: 0, bottom: 20 }}>
             <CartesianGrid
               strokeDasharray="3 3"
               stroke={isDark ? '#374151' : '#E5E7EB'}
@@ -96,12 +85,7 @@ export const DailyConversationsChart = ({ data, isDark }: DailyConversationsChar
               ticks={Array.from({ length: yAxisMax + 1 }, (_, i) => i)}
             />
             <Tooltip content={<CustomTooltip />} />
-            <Bar
-              dataKey="count"
-              fill="#8B5CF6"
-              radius={[4, 4, 0, 0]}
-              maxBarSize={60}
-            />
+            <Bar dataKey="count" fill="#8B5CF6" radius={[4, 4, 0, 0]} maxBarSize={60} />
           </BarChart>
         </ResponsiveContainer>
       </div>

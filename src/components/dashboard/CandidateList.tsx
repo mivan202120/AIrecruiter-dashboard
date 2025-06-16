@@ -1,19 +1,27 @@
 import { useState } from 'react'
 import type { CandidateAnalysis } from '../../types'
+import type { ParsedMessage } from '../../types'
 import { CandidateCard } from './CandidateCard'
+import { ConversationViewer } from './ConversationViewer'
 
 interface CandidateListProps {
   candidates: CandidateAnalysis[]
   selectedId: string | null
   onSelectCandidate: (id: string | null) => void
+  conversations?: Map<string, ParsedMessage[]>
 }
 
 export const CandidateList = ({
   candidates,
   selectedId,
   onSelectCandidate,
+  conversations,
 }: CandidateListProps) => {
   const [filterStatus, setFilterStatus] = useState<'all' | 'PASS' | 'FAIL' | 'NO_RESP'>('all')
+  const [viewingCandidate, setViewingCandidate] = useState<CandidateAnalysis | null>(null)
+
+  console.log('CandidateList - conversations prop:', conversations)
+  console.log('CandidateList - conversations size:', conversations?.size)
 
   const filteredCandidates = candidates.filter(
     (candidate) => filterStatus === 'all' || candidate.status === filterStatus
@@ -32,85 +40,116 @@ export const CandidateList = ({
   }
 
   return (
-    <div className="space-y-4">
-      {/* Filter Tabs */}
-      <div className="flex gap-2 p-1 bg-gray-100 dark:bg-gray-700 rounded-lg">
-        <button
-          onClick={() => setFilterStatus('all')}
-          className={`flex-1 px-3 py-2 rounded-md text-sm font-medium transition-colors ${
-            filterStatus === 'all'
-              ? 'bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 shadow-sm'
-              : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100'
-          }`}
-        >
-          All ({candidates.length})
-        </button>
-        {Object.entries(groupedCandidates).map(([status, items]) => (
+    <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
+      {/* Header with Filter Tabs */}
+      <div className="p-6 border-b border-gray-200 dark:border-gray-700">
+        <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-4">
+          Candidate Analysis Results
+        </h2>
+        <div className="flex gap-2 p-1 bg-gray-100 dark:bg-gray-700 rounded-lg">
           <button
-            key={status}
-            onClick={() => setFilterStatus(status as 'PASS' | 'FAIL' | 'NO_RESP')}
-            className={`flex-1 px-3 py-2 rounded-md text-sm font-medium transition-colors ${
-              filterStatus === status
+            onClick={() => setFilterStatus('all')}
+            className={`flex-1 px-4 py-2.5 rounded-md text-sm font-medium transition-all duration-200 ${
+              filterStatus === 'all'
                 ? 'bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 shadow-sm'
                 : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100'
             }`}
           >
-            {statusLabels[status as keyof typeof statusLabels]} ({items.length})
+            All ({candidates.length})
           </button>
-        ))}
+          {Object.entries(groupedCandidates).map(([status, items]) => (
+            <button
+              key={status}
+              onClick={() => setFilterStatus(status as 'PASS' | 'FAIL' | 'NO_RESP')}
+              className={`flex-1 px-4 py-2.5 rounded-md text-sm font-medium transition-all duration-200 ${
+                filterStatus === status
+                  ? 'bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 shadow-sm'
+                  : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100'
+              }`}
+            >
+              {statusLabels[status as keyof typeof statusLabels]} ({items.length})
+            </button>
+          ))}
+        </div>
       </div>
 
-      {/* Candidate Cards */}
-      <div className="space-y-3 max-h-96 overflow-y-auto">
-        {filterStatus === 'all' ? (
-          Object.entries(groupedCandidates).map(([status, candidates]) => (
-            <div key={status}>
-              {candidates.length > 0 && (
-                <>
-                  <h3 className="text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">
-                    {statusLabels[status as keyof typeof statusLabels]}
-                  </h3>
-                  <div className="space-y-2 mb-4">
-                    {candidates.map((candidate) => (
-                      <CandidateCard
-                        key={candidate.candidateId}
-                        candidate={candidate}
-                        isExpanded={selectedId === candidate.candidateId}
-                        onToggle={() =>
-                          onSelectCandidate(
-                            selectedId === candidate.candidateId ? null : candidate.candidateId
-                          )
-                        }
-                      />
-                    ))}
+      {/* Candidate Cards Container */}
+      <div className="p-6">
+        <div className="space-y-4">
+          {filterStatus === 'all' ? (
+            <>
+              {Object.entries(groupedCandidates).map(([status, statusCandidates]) => (
+                statusCandidates.length > 0 && (
+                  <div key={status} className="space-y-3">
+                    <div className="flex items-center gap-2">
+                      <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wider">
+                        {statusLabels[status as keyof typeof statusLabels]}
+                      </h3>
+                      <div className="flex-1 h-px bg-gray-200 dark:bg-gray-700"></div>
+                    </div>
+                    <div className="grid gap-3">
+                      {statusCandidates.map((candidate) => (
+                        <CandidateCard
+                          key={candidate.candidateId}
+                          candidate={candidate}
+                          isExpanded={selectedId === candidate.candidateId}
+                          onToggle={() =>
+                            onSelectCandidate(
+                              selectedId === candidate.candidateId ? null : candidate.candidateId
+                            )
+                          }
+                          onViewConversation={
+                            conversations ? () => setViewingCandidate(candidate) : undefined
+                          }
+                        />
+                      ))}
+                    </div>
                   </div>
-                </>
-              )}
+                )
+              ))}
+            </>
+          ) : (
+            <div className="grid gap-3">
+              {filteredCandidates.map((candidate) => (
+                <CandidateCard
+                  key={candidate.candidateId}
+                  candidate={candidate}
+                  isExpanded={selectedId === candidate.candidateId}
+                  onToggle={() =>
+                    onSelectCandidate(
+                      selectedId === candidate.candidateId ? null : candidate.candidateId
+                    )
+                  }
+                  onViewConversation={
+                    conversations ? () => setViewingCandidate(candidate) : undefined
+                  }
+                />
+              ))}
             </div>
-          ))
-        ) : (
-          <div className="space-y-2">
-            {filteredCandidates.map((candidate) => (
-              <CandidateCard
-                key={candidate.candidateId}
-                candidate={candidate}
-                isExpanded={selectedId === candidate.candidateId}
-                onToggle={() =>
-                  onSelectCandidate(
-                    selectedId === candidate.candidateId ? null : candidate.candidateId
-                  )
-                }
-              />
-            ))}
-          </div>
-        )}
+          )}
 
-        {filteredCandidates.length === 0 && (
-          <p className="text-center text-gray-500 dark:text-gray-400 py-8">
-            No candidates found with the selected filter.
-          </p>
-        )}
+          {filteredCandidates.length === 0 && (
+            <div className="text-center py-12">
+              <svg className="w-16 h-16 mx-auto text-gray-300 dark:text-gray-600 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
+              </svg>
+              <p className="text-gray-500 dark:text-gray-400 text-lg">
+                No candidates found with the selected filter
+              </p>
+            </div>
+          )}
+        </div>
       </div>
+
+      {/* Conversation Viewer Modal */}
+      {viewingCandidate && conversations && (
+        <ConversationViewer
+          candidate={viewingCandidate}
+          conversations={conversations}
+          isOpen={!!viewingCandidate}
+          onClose={() => setViewingCandidate(null)}
+        />
+      )}
     </div>
   )
 }

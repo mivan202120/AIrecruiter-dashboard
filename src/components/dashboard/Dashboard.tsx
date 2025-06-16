@@ -1,5 +1,5 @@
 import { useState, useMemo } from 'react'
-import type { DashboardData } from '../../types'
+import type { DashboardData, ParsedMessage } from '../../types'
 import { ReportHeader } from './ReportHeader'
 import { SummaryCards } from './SummaryCards'
 import { ResultsDistribution } from './ResultsDistribution'
@@ -11,31 +11,43 @@ import { DetailedMetricsTable } from './DetailedMetricsTable'
 import { DailyConversationsChart } from './DailyConversationsChart'
 import { DailyConversationsTable } from './DailyConversationsTable'
 import { SentimentAnalysis } from './SentimentAnalysis'
+import { ConversationFunnelTable } from './ConversationFunnelTable'
 import { normalizeDashboardData } from '../../utils/dataHelpers'
 
 interface DashboardProps {
   data: DashboardData
+  conversations?: Map<string, ParsedMessage[]>
   isDark: boolean
   onThemeToggle: () => void
   onNewUpload: () => void
 }
 
-export const Dashboard = ({ data, isDark, onThemeToggle, onNewUpload }: DashboardProps) => {
+export const Dashboard = ({
+  data,
+  conversations,
+  isDark,
+  onThemeToggle,
+  onNewUpload,
+}: DashboardProps) => {
   const [selectedCandidateId, setSelectedCandidateId] = useState<string | null>(null)
-  
+
   // Normalize the data to ensure dates are Date objects
   const normalizedData = useMemo(() => normalizeDashboardData(data), [data])
-  
+
   console.log('Dashboard received data:', data)
+  console.log('Dashboard conversations prop:', conversations)
+  console.log('Dashboard conversations size:', conversations?.size)
   console.log('Normalized data:', normalizedData)
   console.log('Total users:', normalizedData.totalUsers)
   console.log('Status distribution:', normalizedData.statusDistribution)
+  console.log('Funnel data:', normalizedData.funnelData)
+  console.log('Funnel stages:', normalizedData.funnelData?.stages)
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors">
       {/* Professional Report Header */}
-      <ReportHeader 
-        data={normalizedData} 
+      <ReportHeader
+        data={normalizedData}
         onNewUpload={onNewUpload}
         onThemeToggle={onThemeToggle}
         isDark={isDark}
@@ -61,15 +73,24 @@ export const Dashboard = ({ data, isDark, onThemeToggle, onNewUpload }: Dashboar
           <SentimentAnalysis candidates={normalizedData.candidates} />
         </div>
 
+        {/* Conversation Funnel */}
+        {normalizedData.funnelData && (
+          <div className="mt-8">
+            <ConversationFunnelTable
+              stages={normalizedData.funnelData.stages}
+              totalCandidates={normalizedData.funnelData.totalCandidates}
+              avgTimeToDecision={normalizedData.funnelData.avgTimeToDecision}
+            />
+          </div>
+        )}
+
         {/* Candidate Details */}
         <div className="mt-8">
-          <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-4">
-            Candidate Details
-          </h2>
           <CandidateList
             candidates={normalizedData.candidates}
             selectedId={selectedCandidateId}
             onSelectCandidate={setSelectedCandidateId}
+            conversations={conversations}
           />
         </div>
 
@@ -88,13 +109,8 @@ export const Dashboard = ({ data, isDark, onThemeToggle, onNewUpload }: Dashboar
 
         {/* Daily Conversations Analysis */}
         <div className="mt-8 grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <DailyConversationsChart 
-            data={normalizedData.dailyConversations} 
-            isDark={isDark} 
-          />
-          <DailyConversationsTable 
-            data={normalizedData.dailyConversations} 
-          />
+          <DailyConversationsChart data={normalizedData.dailyConversations} isDark={isDark} />
+          <DailyConversationsTable data={normalizedData.dailyConversations} />
         </div>
 
         {/* Detailed Metrics Table */}

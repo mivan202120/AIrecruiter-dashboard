@@ -6,6 +6,8 @@ import type {
   AggregateAnalysis,
 } from '../types'
 import { calculateDailyConversations } from '../utils/conversationStats'
+import { analyzeConversationStages, calculateFunnelMetrics } from './conversationAnalyzer'
+import type { ConversationFunnelData } from '../types/funnel'
 
 export interface ProcessingProgress {
   stage: 'analyzing' | 'aggregating' | 'complete'
@@ -46,7 +48,10 @@ export const processConversations = async (
         conversationMetrics: {
           messageCount: conversation.messageCount,
           duration: conversation.duration,
-          startTime: conversation.startTime instanceof Date ? conversation.startTime : new Date(conversation.startTime),
+          startTime:
+            conversation.startTime instanceof Date
+              ? conversation.startTime
+              : new Date(conversation.startTime),
           tags: conversation.tags || [],
         },
       })
@@ -104,6 +109,31 @@ export const processConversations = async (
   // Calculate daily conversations
   const dailyConversations = calculateDailyConversations(candidates)
 
+  // Analyze conversation funnels
+  console.log('🎯 Starting funnel analysis for', conversations.length, 'conversations')
+  const candidateFunnels = conversations.map((conv) => analyzeConversationStages(conv))
+  console.log('Candidate funnels analyzed:', candidateFunnels.length)
+
+  const funnelStages = calculateFunnelMetrics(candidateFunnels)
+  console.log('Funnel stages calculated:', funnelStages)
+
+  // Calculate average time to decision
+  const decisionsWithTime = candidateFunnels.filter((f) => f.decisionMade)
+  const avgTimeToDecision =
+    decisionsWithTime.length > 0
+      ? decisionsWithTime.reduce((sum, f) => sum + f.totalDuration, 0) / decisionsWithTime.length
+      : 0
+
+  const funnelData: ConversationFunnelData = {
+    totalCandidates: conversations.length,
+    stages: funnelStages,
+    overallConversionRate: (decisionsWithTime.length / conversations.length) * 100,
+    avgTimeToDecision,
+    candidateDetails: candidateFunnels,
+  }
+
+  console.log('Final funnel data:', funnelData)
+
   return {
     totalMessages,
     totalUsers: conversations.length,
@@ -112,5 +142,6 @@ export const processConversations = async (
     aggregateAnalysis,
     statusDistribution,
     dailyConversations,
+    funnelData,
   }
 }

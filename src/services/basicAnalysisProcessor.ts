@@ -5,18 +5,20 @@ import type {
   AggregateAnalysis,
 } from '../types'
 import { calculateDailyConversations } from '../utils/conversationStats'
+import { analyzeConversationStages, calculateFunnelMetrics } from './conversationAnalyzer'
+import type { ConversationFunnelData } from '../types/funnel'
 
 export const processWithoutAI = async (
   conversations: CandidateConversation[]
 ): Promise<DashboardData> => {
   console.log('Processing without AI:', conversations.length, 'conversations')
   console.log('First conversation:', conversations[0])
-  
+
   // Create basic analysis for each candidate
   const candidates: CandidateAnalysis[] = conversations.map((conversation) => {
     // Use decision if provided, otherwise determine based on message count
     let status: 'PASS' | 'FAIL' | 'NO_RESP' = 'NO_RESP'
-    
+
     if (conversation.decision) {
       status = conversation.decision
     } else if (conversation.messageCount < 3) {
@@ -32,11 +34,12 @@ export const processWithoutAI = async (
     console.log('Start time type:', typeof conversation.startTime)
     console.log('Start time value:', conversation.startTime)
     console.log('Is Date?', conversation.startTime instanceof Date)
-    
-    const startTime = conversation.startTime instanceof Date 
-      ? conversation.startTime 
-      : new Date(conversation.startTime)
-    
+
+    const startTime =
+      conversation.startTime instanceof Date
+        ? conversation.startTime
+        : new Date(conversation.startTime)
+
     console.log('Converted start time:', startTime)
     console.log('Is valid date?', !isNaN(startTime.getTime()))
 
@@ -74,7 +77,7 @@ export const processWithoutAI = async (
     rejected: candidates.filter((c) => c.status === 'FAIL').length,
     noResponse: candidates.filter((c) => c.status === 'NO_RESP').length,
   }
-  
+
   console.log('Status distribution:', statusDistribution)
   console.log('Candidates:', candidates.length)
 
@@ -92,20 +95,47 @@ export const processWithoutAI = async (
     recommendations: [
       {
         title: 'Enable AI Analysis',
-        description: 'Add your OpenAI API key to unlock detailed candidate assessments and strategic recommendations',
+        description:
+          'Add your OpenAI API key to unlock detailed candidate assessments and strategic recommendations',
         priority: 'High' as const,
       },
     ],
     observedBehaviors: ['Analysis not available without API key'],
-    durationKeyFinding: conversations.length > 0 
-      ? `Average conversation duration: ${Math.round(
-          conversations.reduce((sum, c) => sum + c.duration, 0) / conversations.length / 1000 / 60
-        )} minutes`
-      : 'No conversation data available',
+    durationKeyFinding:
+      conversations.length > 0
+        ? `Average conversation duration: ${Math.round(
+            conversations.reduce((sum, c) => sum + c.duration, 0) / conversations.length / 1000 / 60
+          )} minutes`
+        : 'No conversation data available',
   }
 
   // Calculate daily conversations
   const dailyConversations = calculateDailyConversations(candidates)
+
+  // Analyze conversation funnels
+  console.log('🎯 Starting funnel analysis for', conversations.length, 'conversations')
+  const candidateFunnels = conversations.map((conv) => analyzeConversationStages(conv))
+  console.log('Candidate funnels analyzed:', candidateFunnels.length)
+
+  const funnelStages = calculateFunnelMetrics(candidateFunnels)
+  console.log('Funnel stages calculated:', funnelStages)
+
+  // Calculate average time to decision
+  const decisionsWithTime = candidateFunnels.filter((f) => f.decisionMade)
+  const avgTimeToDecision =
+    decisionsWithTime.length > 0
+      ? decisionsWithTime.reduce((sum, f) => sum + f.totalDuration, 0) / decisionsWithTime.length
+      : 0
+
+  const funnelData: ConversationFunnelData = {
+    totalCandidates: conversations.length,
+    stages: funnelStages,
+    overallConversionRate: (decisionsWithTime.length / conversations.length) * 100,
+    avgTimeToDecision,
+    candidateDetails: candidateFunnels,
+  }
+
+  console.log('Final funnel data:', funnelData)
 
   return {
     totalMessages,
@@ -115,5 +145,6 @@ export const processWithoutAI = async (
     aggregateAnalysis,
     statusDistribution,
     dailyConversations,
+    funnelData,
   }
 }

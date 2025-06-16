@@ -8,20 +8,20 @@ export const parseDate = (dateString: string): Date => {
   try {
     // Handle format with no space between time and am/pm (e.g., "11:45am")
     let normalizedDateString = dateString.trim()
-    
+
     // Add space before am/pm if missing
     normalizedDateString = normalizedDateString.replace(/(\d{1,2}:\d{2})(am|pm)/i, '$1 $2')
-    
+
     // Expected format: "d/m/yyyy h:mm am/pm"
     const parts = normalizedDateString.split(' ')
-    
+
     if (parts.length < 3) {
       console.error('Invalid date format:', dateString)
       return new Date(dateString) // Try native parsing as fallback
     }
 
     const [datePart, timePart, period] = parts
-    
+
     if (!datePart || !timePart || !period) {
       console.error('Missing date components:', { datePart, timePart, period })
       return new Date(dateString) // Try native parsing as fallback
@@ -34,14 +34,15 @@ export const parseDate = (dateString: string): Date => {
     }
 
     const [day, month, year] = dateParts.map(Number)
-    
+
     const timeParts = timePart.split(':')
     if (timeParts.length !== 2) {
       console.error('Invalid time part format:', timePart)
       return new Date(dateString) // Try native parsing as fallback
     }
 
-    let [hours, minutes] = timeParts.map(Number)
+    let [hours] = timeParts.map(Number)
+    const [, minutes] = timeParts.map(Number)
 
     // Handle AM/PM
     const lowerPeriod = period.toLowerCase()
@@ -87,13 +88,13 @@ export const formatDate = (date: Date | string): string => {
   try {
     // Handle both Date objects and date strings
     const dateObj = date instanceof Date ? date : new Date(date)
-    
+
     // Check if the date is valid
     if (isNaN(dateObj.getTime())) {
       console.error('Invalid date value:', date)
       return '—'
     }
-    
+
     return new Intl.DateTimeFormat('en-US', {
       year: 'numeric',
       month: 'short',
@@ -108,19 +109,19 @@ export const formatDate = (date: Date | string): string => {
 }
 
 // Utility to ensure a value is a Date object
-export const ensureDate = (date: Date | string | any): Date => {
+export const ensureDate = (date: Date | string | unknown): Date => {
   if (date instanceof Date) {
     return date
   }
-  
+
   // Try to create a Date from the value
   const dateObj = new Date(date)
-  
+
   // If invalid, return current date as fallback
   if (isNaN(dateObj.getTime())) {
     console.error('Invalid date, using current date as fallback:', date)
     return new Date()
   }
-  
+
   return dateObj
 }
