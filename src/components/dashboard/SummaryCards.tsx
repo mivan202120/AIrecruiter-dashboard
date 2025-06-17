@@ -25,7 +25,7 @@ export const SummaryCards = ({ data }: SummaryCardsProps) => {
           />
         </svg>
       ),
-      bgColor: 'bg-blue-50 dark:bg-blue-950',
+      bgColor: 'bg-blue-50 dark:bg-blue-900/20',
       textColor: 'text-blue-600 dark:text-blue-400',
     },
     {
@@ -42,7 +42,7 @@ export const SummaryCards = ({ data }: SummaryCardsProps) => {
           />
         </svg>
       ),
-      bgColor: 'bg-green-50 dark:bg-green-950',
+      bgColor: 'bg-green-50 dark:bg-green-900/20',
       textColor: 'text-green-600 dark:text-green-400',
     },
     {
@@ -59,7 +59,7 @@ export const SummaryCards = ({ data }: SummaryCardsProps) => {
           />
         </svg>
       ),
-      bgColor: 'bg-red-50 dark:bg-red-950',
+      bgColor: 'bg-red-50 dark:bg-red-900/20',
       textColor: 'text-red-600 dark:text-red-400',
     },
     {
@@ -76,7 +76,7 @@ export const SummaryCards = ({ data }: SummaryCardsProps) => {
           />
         </svg>
       ),
-      bgColor: 'bg-gray-50 dark:bg-gray-800',
+      bgColor: 'bg-gray-50 dark:bg-gray-800/50',
       textColor: 'text-gray-600 dark:text-gray-400',
     },
   ]
@@ -86,16 +86,16 @@ export const SummaryCards = ({ data }: SummaryCardsProps) => {
       {cards.map((card, index) => (
         <div
           key={index}
-          className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6"
+          className="bg-white dark:bg-slate-800 rounded-xl p-6 border border-gray-200 dark:border-slate-700 shadow-sm hover:shadow-lg transition-all duration-300 hover:-translate-y-1 cursor-default"
         >
           <div className="flex items-start justify-between">
             <div>
-              <p className="text-sm font-medium text-gray-600 dark:text-gray-400">{card.title}</p>
-              <p className="mt-2 text-3xl font-bold text-gray-900 dark:text-gray-100">
+              <p className="text-sm font-semibold text-gray-700 dark:text-gray-400 uppercase tracking-wide">{card.title}</p>
+              <p className="mt-3 text-4xl font-bold text-gray-900 dark:text-white">
                 {card.value}
               </p>
               {card.subtitle && (
-                <p className="mt-1 text-sm text-gray-500 dark:text-gray-500">{card.subtitle}</p>
+                <p className="mt-2 text-sm font-medium text-gray-600 dark:text-gray-400">{card.subtitle}</p>
               )}
             </div>
             <div className={`p-3 rounded-lg ${card.bgColor}`}>

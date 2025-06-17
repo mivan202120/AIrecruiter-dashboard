@@ -4,7 +4,7 @@ interface KeyInsightsProps {
 
 export const KeyInsights = ({ insights }: KeyInsightsProps) => {
   return (
-    <div className="bg-gradient-to-r from-blue-50 to-blue-100 dark:from-blue-950 dark:to-blue-900 rounded-lg shadow-sm border border-blue-200 dark:border-blue-800 p-6">
+    <div className="bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-gray-200 dark:border-slate-700 p-6">
       <div className="flex items-start gap-4">
         <div className="p-3 bg-blue-500 rounded-lg flex-shrink-0">
           <svg className="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -17,14 +17,14 @@ export const KeyInsights = ({ insights }: KeyInsightsProps) => {
           </svg>
         </div>
         <div className="flex-1">
-          <h2 className="text-xl font-semibold text-blue-900 dark:text-blue-100 mb-3">
+          <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-3">
             Key Insights
           </h2>
           <ul className="space-y-2">
             {insights.map((insight, index) => (
               <li key={index} className="flex items-start gap-2">
                 <span className="text-blue-500 dark:text-blue-400 mt-0.5">•</span>
-                <span className="text-blue-800 dark:text-blue-200">{insight}</span>
+                <span className="text-gray-700 dark:text-gray-300">{insight}</span>
               </li>
             ))}
           </ul>

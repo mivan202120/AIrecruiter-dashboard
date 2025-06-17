@@ -1,4 +1,5 @@
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts'
+import { useState } from 'react'
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell, Legend } from 'recharts'
 import type { DailyConversationCount } from '../../types'
 import { formatDateForDisplay } from '../../utils/conversationStats'
 
@@ -42,6 +43,8 @@ const CustomTooltip = ({ active, payload, label }: CustomTooltipProps) => {
 }
 
 export const DailyConversationsChart = ({ data, isDark }: DailyConversationsChartProps) => {
+  const [activeBar, setActiveBar] = useState<number | null>(null)
+  
   // Prepare data for the chart
   const chartData = data.map((item) => ({
     ...item,
@@ -52,13 +55,18 @@ export const DailyConversationsChart = ({ data, isDark }: DailyConversationsChar
   const maxCount = Math.max(...data.map((d) => d.count))
   const yAxisMax = Math.ceil(maxCount * 1.2) // Add 20% padding
 
+  const getBarColor = (index: number) => {
+    if (activeBar === null) return '#6200ee'
+    return activeBar === index ? '#6200ee' : '#e0e0e0'
+  }
+
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
+    <div className="bg-white dark:bg-neutral-800 rounded-xl shadow-elevation-1 p-6">
       <div className="mb-4">
-        <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
+        <h3 className="text-lg font-semibold text-neutral-900 dark:text-neutral-100">
           Daily Conversation Activity
         </h3>
-        <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+        <p className="text-sm text-neutral-600 dark:text-neutral-400 mt-1">
           Number of recruitment conversations per day
         </p>
       </div>
@@ -84,22 +92,37 @@ export const DailyConversationsChart = ({ data, isDark }: DailyConversationsChar
               domain={[0, yAxisMax]}
               ticks={Array.from({ length: yAxisMax + 1 }, (_, i) => i)}
             />
-            <Tooltip content={<CustomTooltip />} />
-            <Bar dataKey="count" fill="#8B5CF6" radius={[4, 4, 0, 0]} maxBarSize={60} />
+            <Tooltip content={<CustomTooltip />} cursor={{ fill: 'transparent' }} />
+            <Bar 
+              dataKey="count" 
+              radius={[8, 8, 0, 0]} 
+              maxBarSize={60}
+              onMouseEnter={(_, index) => setActiveBar(index)}
+              onMouseLeave={() => setActiveBar(null)}
+            >
+              {chartData.map((entry, index) => (
+                <Cell key={`cell-${index}`} fill={getBarColor(index)} />
+              ))}
+            </Bar>
           </BarChart>
         </ResponsiveContainer>
       </div>
 
-      <div className="mt-4 flex items-center justify-between text-sm text-gray-600 dark:text-gray-400">
-        <span>
-          Total days: <span className="font-medium">{data.length}</span>
-        </span>
-        <span>
-          Average per day:{' '}
-          <span className="font-medium">
+      <div className="mt-4 grid grid-cols-3 gap-4">
+        <div className="text-center p-3 bg-neutral-50 dark:bg-neutral-900 rounded-lg">
+          <p className="text-sm text-neutral-600 dark:text-neutral-400">Total days</p>
+          <p className="text-lg font-semibold text-neutral-900 dark:text-neutral-100">{data.length}</p>
+        </div>
+        <div className="text-center p-3 bg-neutral-50 dark:bg-neutral-900 rounded-lg">
+          <p className="text-sm text-neutral-600 dark:text-neutral-400">Average per day</p>
+          <p className="text-lg font-semibold text-neutral-900 dark:text-neutral-100">
             {(data.reduce((sum, d) => sum + d.count, 0) / data.length).toFixed(1)}
-          </span>
-        </span>
+          </p>
+        </div>
+        <div className="text-center p-3 bg-neutral-50 dark:bg-neutral-900 rounded-lg">
+          <p className="text-sm text-neutral-600 dark:text-neutral-400">Peak activity</p>
+          <p className="text-lg font-semibold text-neutral-900 dark:text-neutral-100">{maxCount}</p>
+        </div>
       </div>
     </div>
   )

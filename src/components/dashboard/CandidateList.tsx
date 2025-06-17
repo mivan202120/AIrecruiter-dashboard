@@ -40,19 +40,19 @@ export const CandidateList = ({
   }
 
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
+    <div className="bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-gray-200 dark:border-slate-700">
       {/* Header with Filter Tabs */}
-      <div className="p-6 border-b border-gray-200 dark:border-gray-700">
-        <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-4">
+      <div className="p-6 border-b border-gray-200 dark:border-slate-700">
+        <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
           Candidate Analysis Results
         </h2>
-        <div className="flex gap-2 p-1 bg-gray-100 dark:bg-gray-700 rounded-lg">
+        <div className="flex gap-2 p-1 bg-gray-50 dark:bg-slate-700 rounded-lg">
           <button
             onClick={() => setFilterStatus('all')}
             className={`flex-1 px-4 py-2.5 rounded-md text-sm font-medium transition-all duration-200 ${
               filterStatus === 'all'
-                ? 'bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 shadow-sm'
-                : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100'
+                ? 'bg-white dark:bg-slate-600 text-blue-600 dark:text-blue-400 shadow-sm border border-gray-200 dark:border-transparent'
+                : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-slate-600'
             }`}
           >
             All ({candidates.length})
@@ -63,8 +63,8 @@ export const CandidateList = ({
               onClick={() => setFilterStatus(status as 'PASS' | 'FAIL' | 'NO_RESP')}
               className={`flex-1 px-4 py-2.5 rounded-md text-sm font-medium transition-all duration-200 ${
                 filterStatus === status
-                  ? 'bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 shadow-sm'
-                  : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100'
+                  ? 'bg-white dark:bg-slate-600 text-blue-600 dark:text-blue-400 shadow-sm border border-gray-200 dark:border-transparent'
+                  : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-slate-600'
               }`}
             >
               {statusLabels[status as keyof typeof statusLabels]} ({items.length})
@@ -74,7 +74,7 @@ export const CandidateList = ({
       </div>
 
       {/* Candidate Cards Container */}
-      <div className="p-6">
+      <div className="p-6 bg-gray-50 dark:bg-slate-900">
         <div className="space-y-4">
           {filterStatus === 'all' ? (
             <>
@@ -83,10 +83,10 @@ export const CandidateList = ({
                   statusCandidates.length > 0 && (
                     <div key={status} className="space-y-3">
                       <div className="flex items-center gap-2">
-                        <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wider">
+                        <h3 className="text-sm font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">
                           {statusLabels[status as keyof typeof statusLabels]}
                         </h3>
-                        <div className="flex-1 h-px bg-gray-200 dark:bg-gray-700"></div>
+                        <div className="flex-1 h-px bg-gray-300 dark:bg-slate-700"></div>
                       </div>
                       <div className="grid gap-3">
                         {statusCandidates.map((candidate) => (

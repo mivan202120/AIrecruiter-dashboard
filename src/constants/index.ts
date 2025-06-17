@@ -20,9 +20,9 @@ export const ENTITY_MAPPING = {
 } as const
 
 export const STATUS_COLORS = {
-  PASS: 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200',
-  FAIL: 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200',
-  NO_RESP: 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300',
+  PASS: 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400 border border-green-300 dark:border-green-800',
+  FAIL: 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400 border border-red-300 dark:border-red-800',
+  NO_RESP: 'bg-gray-100 text-gray-700 dark:bg-gray-800/30 dark:text-gray-400 border border-gray-300 dark:border-gray-700',
 } as const
 
 export const PRIORITY_COLORS = {

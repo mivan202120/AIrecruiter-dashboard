@@ -1,5 +1,93 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
 @import 'tailwindcss';
+
+/* Base styles for better contrast */
+body {
+  @apply text-neutral-900 dark:text-neutral-100;
+  font-size: 16px;
+  line-height: 1.6;
+}
+
+/* Focus styles for better accessibility */
+*:focus {
+  outline: none;
+}
+
+*:focus-visible {
+  outline: 3px solid #2196f3;
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+  box-shadow: 0 0 0 3px rgba(33, 150, 243, 0.3);
+}
+
+/* Better text contrast */
+.text-primary {
+  color: #1976d2;
+}
+
+.dark .text-primary {
+  color: #64b5f6;
+}
+
+.text-secondary {
+  color: #616161;
+}
+
+.dark .text-secondary {
+  color: #bdbdbd;
+}
+
+/* Card improvements */
+.card {
+  @apply bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-700;
+}
+
+/* Button base styles */
+.btn {
+  @apply font-medium transition-all duration-200 transform active:scale-95;
+}
+
+/* Skip navigation styles */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
+.not-sr-only {
+  position: static;
+  width: auto;
+  height: auto;
+  padding: 0;
+  margin: 0;
+  overflow: visible;
+  clip: auto;
+  white-space: normal;
+}
+
+.focus-within\:not-sr-only:focus-within {
+  position: static;
+  width: auto;
+  height: auto;
+  padding: 0;
+  margin: 0;
+  overflow: visible;
+  clip: auto;
+  white-space: normal;
+}
 
 /* Animated stripes for progress bars */
 @keyframes slide {
@@ -42,4 +130,35 @@
 
 .loading-dot:nth-child(2) {
   animation-delay: -0.16s;
+}
+
+/* Shimmer animation for skeleton loaders */
+@keyframes shimmer {
+  0% {
+    background-position: -1000px 0;
+  }
+  100% {
+    background-position: 1000px 0;
+  }
+}
+
+.animate-shimmer {
+  background: linear-gradient(
+    90deg,
+    #f0f0f0 0px,
+    #f8f8f8 40px,
+    #f0f0f0 80px
+  );
+  background-size: 1000px 100%;
+  animation: shimmer 2s infinite linear;
+}
+
+.dark .animate-shimmer {
+  background: linear-gradient(
+    90deg,
+    #374151 0px,
+    #4b5563 40px,
+    #374151 80px
+  );
+  background-size: 1000px 100%;
 }

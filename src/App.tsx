@@ -7,6 +7,7 @@ import { Dashboard } from './components/dashboard/Dashboard'
 import { useApiKey } from './hooks/useApiKey'
 import { processWithoutAI } from './services/basicAnalysisProcessor'
 import { normalizeDashboardData } from './utils/dataHelpers'
+import { SkipNavigation } from './components/common/SkipNavigation'
 import type { CandidateConversation, DashboardData, ParsedMessage } from './types'
 
 // Helper function to create conversations map
@@ -55,17 +56,22 @@ function AppContent() {
 
   return (
     <div className={`min-h-screen ${isDark ? 'dark' : ''}`}>
+      <SkipNavigation />
       {!rawData ? (
-        <UploadPage onDataProcessed={handleDataProcessed} />
+        <main id="main-content" role="main">
+          <UploadPage onDataProcessed={handleDataProcessed} />
+        </main>
       ) : isAnalyzing ? (
-        <div className="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors">
+        <div className="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors antialiased">
           <div className="container mx-auto px-4 py-8">
-            <header className="text-center mb-8">
+            <header className="text-center mb-8" role="banner">
               <h1 className="text-3xl font-bold bg-gradient-to-r from-primary-600 to-accent-purple bg-clip-text text-transparent">
                 AI Recruiter Analytics Dashboard
               </h1>
             </header>
-            <AnalysisProgress conversations={rawData} onComplete={handleAnalysisComplete} />
+            <main id="main-content" role="main">
+              <AnalysisProgress conversations={rawData} onComplete={handleAnalysisComplete} />
+            </main>
           </div>
         </div>
       ) : dashboardData ? (

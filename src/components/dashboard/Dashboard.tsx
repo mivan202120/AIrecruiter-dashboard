@@ -1,5 +1,7 @@
 import { useState, useMemo } from 'react'
 import type { DashboardData, ParsedMessage } from '../../types'
+import { useKeyboardShortcuts } from '../../hooks/useKeyboardShortcuts'
+import { KeyboardShortcutsModal } from '../common/KeyboardShortcutsModal'
 import { ReportHeader } from './ReportHeader'
 import { SummaryCards } from './SummaryCards'
 import { ResultsDistribution } from './ResultsDistribution'
@@ -12,6 +14,7 @@ import { DailyConversationsChart } from './DailyConversationsChart'
 import { DailyConversationsTable } from './DailyConversationsTable'
 import { SentimentAnalysis } from './SentimentAnalysis'
 import { ConversationFunnelTable } from './ConversationFunnelTable'
+import { AIInsightsPanel } from './AIInsightsPanel'
 import { normalizeDashboardData } from '../../utils/dataHelpers'
 
 interface DashboardProps {
@@ -30,9 +33,46 @@ export const Dashboard = ({
   onNewUpload,
 }: DashboardProps) => {
   const [selectedCandidateId, setSelectedCandidateId] = useState<string | null>(null)
+  const [showShortcuts, setShowShortcuts] = useState(false)
+  const [showExportDialog, setShowExportDialog] = useState(false)
 
   // Normalize the data to ensure dates are Date objects
   const normalizedData = useMemo(() => normalizeDashboardData(data), [data])
+
+  // Setup keyboard shortcuts
+  useKeyboardShortcuts([
+    {
+      key: 'n',
+      ctrlKey: true,
+      action: onNewUpload,
+      description: 'New upload'
+    },
+    {
+      key: 't',
+      ctrlKey: true,
+      action: onThemeToggle,
+      description: 'Toggle theme'
+    },
+    {
+      key: 'e',
+      ctrlKey: true,
+      action: () => setShowExportDialog(true),
+      description: 'Export data'
+    },
+    {
+      key: '?',
+      action: () => setShowShortcuts(true),
+      description: 'Show keyboard shortcuts'
+    },
+    {
+      key: 'Escape',
+      action: () => {
+        setShowShortcuts(false)
+        setShowExportDialog(false)
+      },
+      description: 'Close dialogs'
+    }
+  ])
 
   console.log('Dashboard received data:', data)
   console.log('Dashboard conversations prop:', conversations)
@@ -46,7 +86,7 @@ export const Dashboard = ({
   return (
     <div
       id="dashboard-content"
-      className="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors"
+      className="min-h-screen bg-white dark:bg-slate-900 transition-colors"
     >
       {/* Professional Report Header */}
       <ReportHeader
@@ -57,9 +97,14 @@ export const Dashboard = ({
       />
 
       {/* Main Content */}
-      <main className="container mx-auto px-4 py-8">
+      <main id="main-content" role="main" className="container mx-auto px-4 py-8">
         {/* Summary Cards */}
         <SummaryCards data={normalizedData} />
+
+        {/* AI-Powered Insights */}
+        <div className="mt-8">
+          <AIInsightsPanel data={normalizedData} />
+        </div>
 
         {/* Results Distribution */}
         <div className="mt-8">
@@ -121,16 +166,22 @@ export const Dashboard = ({
           <DetailedMetricsTable candidates={normalizedData.candidates} />
         </div>
 
-        {/* Footer */}
-        <footer className="mt-12 pt-8 border-t border-gray-200 dark:border-gray-700">
-          <div className="text-center text-sm text-gray-600 dark:text-gray-400">
-            <p>Analysis generated on {new Date(normalizedData.processedAt).toLocaleString()}</p>
-            <p className="mt-2">
-              Powered by OpenAI • Version {import.meta.env.VITE_APP_VERSION || '1.0.0'}
-            </p>
-          </div>
-        </footer>
       </main>
+
+      {/* Footer */}
+      <footer id="footer" role="contentinfo" className="mt-12 pt-8 border-t border-gray-200 dark:border-gray-700 container mx-auto px-4">
+        <div className="text-center text-sm text-gray-600 dark:text-gray-400">
+          <p>Analysis generated on {new Date(normalizedData.processedAt).toLocaleString()}</p>
+          <p className="mt-2">
+            Powered by OpenAI • Version {import.meta.env.VITE_APP_VERSION || '1.0.0'}
+          </p>
+        </div>
+      </footer>
+
+      <KeyboardShortcutsModal 
+        isOpen={showShortcuts} 
+        onClose={() => setShowShortcuts(false)} 
+      />
     </div>
   )
 }
